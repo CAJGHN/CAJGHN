@@ -20,14 +20,83 @@
       font-size: 0.9em;
       color: #777;
     }
+    .center-buttons {
+      margin: 100px 0;
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+    }
+    .center-buttons a {
+      display: inline-block;
+      padding: 20px 50px;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: white;
+      background: #007BFF;
+      border-radius: 12px;
+      text-decoration: none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s, background 0.3s;
+    }
+    .center-buttons a:hover {
+      transform: scale(1.2);
+      background: #0056b3;
+    }
+    .floating-buttons {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 1000;
+    }
+    .floating-buttons a {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+    }
+    .floating-buttons a:hover {
+      transform: scale(1.2);
+    }
+    .floating-buttons img {
+      width: 70%;
+      height: 70%;
+      object-fit: contain;
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>Welcome to CAJGHN!</h1>
   </header>
+
+  <div class="center-buttons">
+    <a href="https://cajghn.com/arcade" target="_blank">🎮 Arcade</a>
+    <a href="https://t.me/eoiai" target="_blank">🚀 EOI</a>
+  </div>
+
   <footer>
     <p>© 2025 CAJGHN. All rights reserved.</p>
   </footer>
+
+  <div class="floating-buttons">
+    <a href="https://t.me/cajghn" target="_blank">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
+    </a>
+    <a href="https://www.youtube.com/@CAJGHN" target="_blank">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" alt="YouTube">
+    </a>
+    <a href="https://www.instagram.com/cajghn/" target="_blank">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram">
+    </a>
+  </div>
 </body>
 </html>
