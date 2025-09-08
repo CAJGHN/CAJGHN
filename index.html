@@ -4,99 +4,112 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CAJGHN</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
-      background-color: #f5f5f5;
-      color: #333;
+    .menu-enter {
+      transform: scaleY(0);
+      opacity: 0;
+      transform-origin: top;
+      transition: all 0.3s ease-in-out;
     }
-    header h1 {
-      color: #222;
+    .menu-enter-active {
+      transform: scaleY(1);
+      opacity: 1;
     }
-    footer {
-      margin-top: 50px;
-      font-size: 0.9em;
-      color: #777;
+    .link-click {
+      transform: none;
+      transition: none;
     }
-    .center-buttons {
-      margin: 100px 0;
-      display: flex;
-      justify-content: center;
-      gap: 40px;
+    .hover-white:hover {
+      color: #ffffff;
     }
-    .center-buttons a {
-      display: inline-block;
-      padding: 20px 50px;
-      font-size: 1.5em;
-      font-weight: bold;
-      color: white;
-      background: #007BFF;
-      border-radius: 12px;
-      text-decoration: none;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      transition: transform 0.2s, background 0.3s;
-    }
-    .center-buttons a:hover {
-      transform: scale(1.2);
-      background: #0056b3;
-    }
-    .floating-buttons {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      z-index: 1000;
-    }
-    .floating-buttons a {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      overflow: hidden;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.2s;
-    }
-    .floating-buttons a:hover {
-      transform: scale(1.2);
-    }
-    .floating-buttons img {
-      width: 70%;
-      height: 70%;
-      object-fit: contain;
+    .footer-icon {
+      width: 48px;
+      height: 48px;
     }
   </style>
 </head>
-<body>
-  <header>
-    <h1>Welcome to CAJGHN!</h1>
-  </header>
+<body class="bg-gray-300">
 
-  <div class="center-buttons">
-    <a href="https://cajghn.com/arcade" target="_blank">🎮 Arcade</a>
-    <a href="https://t.me/eoiai" target="_blank">🚀 EOI</a>
-  </div>
+  <nav class="bg-gray-400 shadow-md fixed w-full z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-20">
+        <a href="https://cajghn.com" class="text-3xl font-bold text-black hover-white transition-colors">
+          CAJGHN
+        </a>
+        <div class="hidden md:flex space-x-6">
+          <a href="https://cajghn.com/studio" target="_blank" class="text-black font-semibold hover-white transition-colors">Studio</a>
+          <a href="https://cajghn.com/arcade" target="_blank" class="text-black font-semibold hover-white transition-colors">Arcade</a>
+          <a href="https://cajghn.com/ai" target="_blank" class="text-black font-semibold hover-white transition-colors">AI</a>
+          <a href="https://www.facebook.com" target="_blank" class="text-black font-semibold hover-white transition-colors">Facebook</a>
+          <a href="https://t.me/eoiai" target="_blank" class="text-black font-semibold hover-white transition-colors">EOI</a>
+        </div>
+        <div class="md:hidden">
+          <button id="menu-btn" class="focus:outline-none">
+            <svg class="w-8 h-8 text-black hover-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="menu" class="hidden md:hidden bg-gray-400 shadow-md menu-enter">
+      <a href="https://cajghn.com/studio" target="_blank" class="block px-4 py-2 text-black font-semibold hover-white transition-colors mobile-link rounded">Studio</a>
+      <a href="https://cajghn.com/arcade" target="_blank" class="block px-4 py-2 text-black font-semibold hover-white transition-colors mobile-link rounded">Arcade</a>
+      <a href="https://cajghn.com/ai" target="_blank" class="block px-4 py-2 text-black font-semibold hover-white transition-colors mobile-link rounded">AI</a>
+      <a href="https://www.facebook.com" target="_blank" class="block px-4 py-2 text-black font-semibold hover-white transition-colors mobile-link rounded">Facebook</a>
+      <a href="https://t.me/eoiai" target="_blank" class="block px-4 py-2 text-black font-semibold hover-white transition-colors mobile-link rounded">EOI</a>
+    </div>
+  </nav>
 
-  <footer>
-    <p>© 2025 CAJGHN. All rights reserved.</p>
+  <main class="h-screen flex justify-center items-center bg-gray-300">
+    <h1 class="text-5xl font-bold text-black">Welcome to CAJGHN.com</h1>
+  </main>
+
+  <footer class="bg-gray-400 text-center py-6 shadow-inner">
+    <p class="text-black text-sm">© 2025 CAJGHN. All rights reserved.</p>
+    <p class="text-black text-sm mt-2">
+      Business inquiries: 
+      <a href="mailto:cajghn@gmail.com" class="hover-white underline transition-colors">
+        cajghn@gmail.com
+      </a>
+    </p>
+
+    <div class="flex justify-center space-x-4 mt-4">
+      <a href="https://www.youtube.com/@CAJGHN" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube" class="footer-icon">
+      </a>
+      <a href="https://www.instagram.com/cajghn/" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="footer-icon">
+      </a>
+      <a href="https://t.me/cajghn" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="footer-icon">
+      </a>
+    </div>
   </footer>
 
-  <div class="floating-buttons">
-    <a href="https://t.me/cajghn" target="_blank">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram">
-    </a>
-    <a href="https://www.youtube.com/@CAJGHN" target="_blank">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" alt="YouTube">
-    </a>
-    <a href="https://www.instagram.com/cajghn/" target="_blank">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram">
-    </a>
-  </div>
+  <script>
+    const menuBtn = document.getElementById("menu-btn");
+    const menu = document.getElementById("menu");
+    const mobileLinks = document.querySelectorAll(".mobile-link");
+
+    menuBtn.addEventListener("click", () => {
+      if (menu.classList.contains("hidden")) {
+        menu.classList.remove("hidden");
+        setTimeout(() => menu.classList.add("menu-enter-active"), 10);
+      } else {
+        menu.classList.remove("menu-enter-active");
+        setTimeout(() => menu.classList.add("hidden"), 300);
+      }
+    });
+
+    mobileLinks.forEach(link => {
+      link.addEventListener("click", (e) => {
+        e.target.classList.add("link-click");
+        setTimeout(() => e.target.classList.remove("link-click"), 150);
+      });
+    });
+  </script>
 </body>
 </html>
