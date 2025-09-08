@@ -4,142 +4,114 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CAJGHN Arcade</title>
+<script src="https://cdn.tailwindcss.com"></script>
 <style>
-body { margin:0; background:#000; font-family: Arial, sans-serif; overflow:hidden; }
-canvas { display:block; margin:0 auto; background:#111; border:5px solid #555; }
-#score { position:absolute; top:10px; left:10px; color:#fff; font-size:36px; font-weight:bold; text-shadow:2px 2px #000; }
-#highScore { position:absolute; top:60px; left:10px; color:#fff; font-size:28px; font-weight:bold; text-shadow:2px 2px #000; }
-#gameOver { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#fff; font-size:36px; display:none; text-align:center; text-shadow:2px 2px #000; }
-#startBtn, #restartBtn { position:absolute; padding:15px 30px; font-size:24px; border:none; border-radius:10px; cursor:pointer; }
-#startBtn { top:50%; left:50%; transform:translate(-50%,-50%); background:#0f0; color:#000; }
-#restartBtn { top:60%; left:50%; transform:translate(-50%,-50%); background:#f00; color:#000; display:none; }
-.touch-controls { position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); display: flex; gap: 50px; z-index: 1000; }
-.touch-button { width: 80px; height: 80px; background: rgba(255,255,255,0.3); border-radius: 50%; text-align: center; line-height: 80px; font-size: 30px; color: #fff; user-select: none; }
-.touch-button:active { background: rgba(255,255,255,0.6); }
+body {
+  background-color: #000000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Courier New', monospace;
+  flex-direction: column;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+#display {
+  width: 100%;
+  max-width: 300px;
+  height: 70px;
+  background: #111827;
+  color: #00ff7f;
+  font-size: clamp(2rem, 5vw, 3rem);
+  text-align: center;
+  line-height: 70px;
+  letter-spacing: 10px;
+  margin-bottom: 25px;
+  border: 3px solid #00ff7f;
+  border-radius: 12px;
+  text-shadow: 0 0 8px #00ff7f, 0 0 16px #00ff7f, 0 0 24px #32cd32;
+  box-shadow: 0 0 20px #00ff7f inset;
+}
+#keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  max-width: 300px;
+  width: 100%;
+}
+.key {
+  width: 100%;
+  aspect-ratio: 1/1;
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  font-weight: bold;
+  color: #00ff7f;
+  background: #111827;
+  border: 3px solid #00ff7f;
+  border-radius: 12px;
+  cursor: pointer;
+  text-shadow: 0 0 6px #00ff7f, 0 0 12px #00ff7f, 0 0 18px #32cd32;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.key:active {
+  transform: scale(1.1);
+  box-shadow: 0 0 30px #00ff7f inset;
+}
 </style>
 </head>
 <body>
-<div id="score">Score: 0</div>
-<div id="highScore">High Score: 0</div>
-<div id="gameOver">Game Over!</div>
-<button id="startBtn">START</button>
-<button id="restartBtn">RESTART</button>
-<canvas id="gameCanvas" width="400" height="600"></canvas>
-<div class="touch-controls">
-  <div class="touch-button" id="leftBtn">◀</div>
-  <div class="touch-button" id="rightBtn">▶</div>
+
+<div id="display">____</div>
+
+<div id="keypad">
+  <button class="key" onclick="pressKey('0')">0</button>
+  <button class="key" onclick="pressKey('1')">1</button>
+  <button class="key" onclick="pressKey('2')">2</button>
+  <button class="key" onclick="pressKey('3')">3</button>
+  <button class="key" onclick="pressKey('4')">4</button>
+  <button class="key" onclick="pressKey('5')">5</button>
+  <button class="key" onclick="pressKey('6')">6</button>
+  <button class="key" onclick="pressKey('7')">7</button>
+  <button class="key" onclick="pressKey('8')">8</button>
+  <button class="key" onclick="pressKey('9')">9</button>
+  <button class="key" onclick="pressKey('C')">←</button>
+  <button class="key" onclick="pressKey('*')">*</button>
 </div>
+
 <script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+const display = document.getElementById('display');
+let input = "";
+const correctPass = "0725";
 
-let score = 0;
-let highScore = 0;
-let gameOver = false;
-let gameStarted = false;
-
-let player = { x:180, y:520, size:50, speed:6 };
-let fallingBalls = [];
-let keys = {};
-
-document.addEventListener('keydown', e => keys[e.key] = true);
-document.addEventListener('keyup', e => keys[e.key] = false);
-
-let leftPressed = false;
-let rightPressed = false;
-
-const leftBtn = document.getElementById('leftBtn');
-const rightBtn = document.getElementById('rightBtn');
-
-[leftBtn,rightBtn].forEach(btn=>{
-  btn.addEventListener('touchstart', e=>{ e.preventDefault(); if(btn.id==='leftBtn') leftPressed=true; else rightPressed=true; });
-  btn.addEventListener('touchend', e=>{ e.preventDefault(); if(btn.id==='leftBtn') leftPressed=false; else rightPressed=false; });
-  btn.addEventListener('mousedown', e=>{ if(btn.id==='leftBtn') leftPressed=true; else rightPressed=true; });
-  btn.addEventListener('mouseup', e=>{ if(btn.id==='leftBtn') leftPressed=false; else rightPressed=false; });
-  btn.addEventListener('mouseleave', e=>{ if(btn.id==='leftBtn') leftPressed=false; else rightPressed=false; });
-});
-
-function spawnBall(){
-  const x = Math.random() * (canvas.width - player.size);
-  fallingBalls.push({ x, y:-player.size, size:player.size, speed:2 + score*0.05 });
-}
-
-function isColliding(a,b){
-  const dx = (a.x + a.size/2) - (b.x + b.size/2);
-  const dy = (a.y + a.size/2) - (b.y + b.size/2);
-  const distance = Math.sqrt(dx*dx + dy*dy);
-  return distance < a.size;
-}
-
-function resetGame(){
-  if(score > highScore) highScore = score;
-  score = 0;
-  fallingBalls = [];
-  player.x = 180;
-  gameOver = false;
-  document.getElementById('score').innerText = "Score: " + score;
-  document.getElementById('highScore').innerText = "High Score: " + highScore;
-  document.getElementById('gameOver').style.display = 'none';
-  document.getElementById('restartBtn').style.display = 'none';
-  gameLoop();
-}
-
-function update(){
-  if(gameOver || !gameStarted) return;
-  if(keys['ArrowLeft'] || leftPressed) if(player.x>0) player.x -= player.speed;
-  if(keys['ArrowRight'] || rightPressed) if(player.x+player.size<canvas.width) player.x += player.speed;
-
-  fallingBalls.forEach((b,i)=>{
-    b.y += b.speed;
-    if(isColliding(player,b)) gameOver = true;
-    if(b.y > canvas.height){
-      fallingBalls.splice(i,1);
-      score +=1;
-      document.getElementById('score').innerText = "Score: " + score;
+function pressKey(val){
+  if(val === "C") {
+    input = input.slice(0,-1);
+    updateDisplay();
+  } else if(val === "*") {
+    if(input === correctPass){
+      window.open("https://cajghn.com/game","_blank");
+    } else {
+      display.textContent = "ERR!";
     }
-  });
-
-  if(fallingBalls.length < 3 && Math.random() < 0.02) spawnBall();
-}
-
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='#222';
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.strokeStyle='#555';
-  ctx.lineWidth = 5;
-  ctx.strokeRect(0,0,canvas.width,canvas.height);
-
-  ctx.fillStyle='green';
-  ctx.beginPath();
-  ctx.arc(player.x+player.size/2, player.y+player.size/2, player.size/2,0,Math.PI*2);
-  ctx.fill();
-
-  fallingBalls.forEach(b=>{
-    ctx.fillStyle='red';
-    ctx.beginPath();
-    ctx.arc(b.x+b.size/2, b.y+b.size/2, b.size/2,0,Math.PI*2);
-    ctx.fill();
-  });
-}
-
-function gameLoop(){
-  update();
-  draw();
-  if(!gameOver) requestAnimationFrame(gameLoop);
-  else {
-    document.getElementById('gameOver').style.display='block';
-    document.getElementById('restartBtn').style.display='block';
+  } else {
+    if(input.length < 4){
+      input += val;
+      updateDisplay();
+    }
   }
 }
 
-document.getElementById('startBtn').addEventListener('click', ()=>{
-  gameStarted=true;
-  document.getElementById('startBtn').style.display='none';
-  gameLoop();
-});
-
-document.getElementById('restartBtn').addEventListener('click', resetGame);
+function updateDisplay(){
+  if(display.textContent === "ERR!") return;
+  if(input === ""){
+    display.textContent = "____";
+  } else if(input.length < 4){
+    display.textContent = input.padEnd(4,'_');
+  } else {
+    display.textContent = input;
+  }
+}
 </script>
+
 </body>
 </html>
