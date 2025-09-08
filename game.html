@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAJGHN Game</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #000;
+  font-family: 'Courier New', monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+#game-container {
+  position: relative;
+  width: 400px;
+  max-width: 95vw;
+  height: 600px;
+  background: #111;
+  border: 3px solid #00ff7f;
+  overflow: hidden;
+}
+#player {
+  position: absolute;
+  bottom: 20px;
+  left: 180px;
+  width: 40px;
+  height: 70px;
+  background: red;
+  border-radius: 8px;
+  transition: left 0.1s linear;
+}
+.obstacle {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background: yellow;
+  top: -50px;
+  border-radius: 4px;
+}
+#scoreboard {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  text-align: right;
+  color: #00ff7f;
+}
+#scoreboard div {
+  font-size: 1.2rem;
+  text-shadow: 0 0 8px #00ff7f, 0 0 16px #00ff7f;
+}
+#overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #00ff7f;
+  font-size: 2rem;
+  z-index: 10;
+  font-weight: bold;
+}
+button {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 1.4rem;
+  background: #111;
+  color: #00ff7f;
+  border: 2px solid #00ff7f;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover {
+  background: #00ff7f;
+  color: #111;
+}
+.touch-btn {
+  position: absolute;
+  bottom: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(0,255,127,0.2);
+  border: 2px solid #00ff7f;
+  color: #00ff7f;
+  font-size: 2rem;
+  text-align: center;
+  line-height: 56px;
+  font-weight: bold;
+  user-select: none;
+}
+#left-btn { left: 20px; }
+#right-btn { right: 20px; }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="scoreboard">
+    <div id="score">Score: 0</div>
+    <div id="highscore">High: 0</div>
+  </div>
+  <div id="player"></div>
+  <div id="overlay">
+    <div id="title">CAJGHN Game</div>
+    <button id="startBtn">Start Game</button>
+  </div>
+  <div id="left-btn" class="touch-btn">&#8592;</div>
+  <div id="right-btn" class="touch-btn">&#8594;</div>
+</div>
+
+<script>
+const player = document.getElementById('player');
+const gameContainer = document.getElementById('game-container');
+const scoreEl = document.getElementById('score');
+const highEl = document.getElementById('highscore');
+const overlay = document.getElementById('overlay');
+const startBtn = document.getElementById('startBtn');
+const leftBtn = document.getElementById('left-btn');
+const rightBtn = document.getElementById('right-btn');
+
+let playerX = 180;
+let targetX = 180;
+let obstacles = [];
+let score = 0;
+let highscore = 0;
+let speed = 2;
+let gameRunning = false;
+let obstacleInterval;
+let gameLoopId;
+let leftPressed = false;
+let rightPressed = false;
+
+function createObstacle() {
+  const obs = document.createElement('div');
+  obs.classList.add('obstacle');
+  obs.style.left = Math.floor(Math.random() * (gameContainer.clientWidth - 40)) + 'px';
+  obs.style.top = '-50px';
+  gameContainer.appendChild(obs);
+  obstacles.push(obs);
+}
+
+function moveObstacles() {
+  obstacles.forEach((obs, index) => {
+    let top = parseFloat(obs.style.top);
+    top += speed;
+    obs.style.top = top + 'px';
+    if(top > gameContainer.clientHeight){
+      obs.remove();
+      obstacles.splice(index, 1);
+      score += 1;
+      scoreEl.textContent = "Score: " + score;
+      if(score > highscore) highscore = score;
+      highEl.textContent = "High: " + highscore;
+      if(score % 10 === 0) speed += 0.5;
+    }
+
+    let playerRect = player.getBoundingClientRect();
+    let obsRect = obs.getBoundingClientRect();
+    if(!(playerRect.right < obsRect.left || 
+         playerRect.left > obsRect.right || 
+         playerRect.bottom < obsRect.top || 
+         playerRect.top > obsRect.bottom)) {
+      endGame();
+    }
+  });
+}
+
+function gameLoop() {
+  if(!gameRunning) return;
+  if(leftPressed) targetX -= 5;
+  if(rightPressed) targetX += 5;
+  playerX += (targetX - playerX) * 0.2;
+  player.style.left = Math.max(0, Math.min(playerX, gameContainer.clientWidth - 40)) + 'px';
+  moveObstacles();
+  gameLoopId = requestAnimationFrame(gameLoop);
+}
+
+document.addEventListener('keydown', (e) => {
+  if(!gameRunning) return;
+  if(e.key === 'ArrowLeft') targetX -= 20;
+  if(e.key === 'ArrowRight') targetX += 20;
+});
+
+document.addEventListener('keyup', (e) => {
+  if(e.key === 'ArrowLeft') leftPressed = false;
+  if(e.key === 'ArrowRight') rightPressed = false;
+});
+
+leftBtn.addEventListener('mousedown', () => leftPressed = true);
+leftBtn.addEventListener('mouseup', () => leftPressed = false);
+leftBtn.addEventListener('touchstart', (e) => { e.preventDefault(); leftPressed = true; });
+leftBtn.addEventListener('touchend', () => leftPressed = false);
+
+rightBtn.addEventListener('mousedown', () => rightPressed = true);
+rightBtn.addEventListener('mouseup', () => rightPressed = false);
+rightBtn.addEventListener('touchstart', (e) => { e.preventDefault(); rightPressed = true; });
+rightBtn.addEventListener('touchend', () => rightPressed = false);
+
+function startGame() {
+  overlay.style.display = 'none';
+  obstacles.forEach(o => o.remove());
+  obstacles = [];
+  playerX = 180;
+  targetX = 180;
+  score = 0;
+  speed = 2;
+  scoreEl.textContent = "Score: 0";
+  gameRunning = true;
+  obstacleInterval = setInterval(createObstacle, 2000);
+  gameLoop();
+}
+
+function endGame() {
+  gameRunning = false;
+  clearInterval(obstacleInterval);
+  cancelAnimationFrame(gameLoopId);
+  overlay.innerHTML = `<div>Game Over</div><button onclick="startGame()">Retry</button>`;
+  overlay.style.display = 'flex';
+}
+
+startBtn.addEventListener('click', startGame);
+</script>
+</body>
+</html>
