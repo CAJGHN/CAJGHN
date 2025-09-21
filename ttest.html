@@ -87,7 +87,7 @@ canvas#particles {
   <button>Action 2</button>
 </div>
 
-<button id="start">Enable Motion & Camera</button>
+<button id="start">Enable Camera & Motion</button>
 
 <script>
 const card = document.getElementById('card');
@@ -123,11 +123,7 @@ window.addEventListener('resize', ()=>{
 });
 
 // tilt 반영
-let tiltX=0, tiltY=0;
 function updateTilt(beta, gamma){
-  tiltX = gamma || 0;
-  tiltY = beta || 0;
-
   const maxRotate = 25;
   const x = Math.max(Math.min(gamma/90*maxRotate, maxRotate), -maxRotate);
   const y = Math.max(Math.min(beta/90*maxRotate, maxRotate), -maxRotate);
@@ -143,15 +139,18 @@ function updateTilt(beta, gamma){
   });
 }
 
-// 카메라 접근
+// 카메라 접근 (후면)
 async function enableCamera(){
   try{
-    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}, audio:false});
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode:{ exact:"environment" } },
+      audio:false
+    });
     video.srcObject = stream;
     video.muted = true;
-    await video.play(); // iOS에서 확실히 재생
+    await video.play(); // iOS에서 필수
   }catch(e){
-    alert('Camera access denied');
+    alert('Camera access denied or not available');
     console.error(e);
   }
 }
@@ -178,12 +177,14 @@ function animateParticles(){
 
 // 시작 버튼 클릭
 startBtn.addEventListener('click', async ()=>{
-  enableCamera();
+  await enableCamera(); // 후면 카메라 켜기
   if(typeof DeviceOrientationEvent.requestPermission==='function'){
     DeviceOrientationEvent.requestPermission().then(state=>{
       if(state==='granted'){
         window.addEventListener('deviceorientation', e=>updateTilt(e.beta||0,e.gamma||0));
-      }else{ alert('Motion permission denied'); }
+      }else{
+        alert('Motion permission denied');
+      }
     }).catch(console.error);
   }else{
     window.addEventListener('deviceorientation', e=>updateTilt(e.beta||0,e.gamma||0));
