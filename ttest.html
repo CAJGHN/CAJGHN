@@ -143,12 +143,12 @@ function updateTilt(beta, gamma){
 async function enableCamera(){
   try{
     const stream = await navigator.mediaDevices.getUserMedia({
-      video:{ facingMode:{ exact:"environment" } },
+      video:{ facingMode:"environment" }, // exact 제거
       audio:false
     });
     video.srcObject = stream;
     video.muted = true;
-    await video.play(); // iOS에서 필수
+    await video.play(); // iOS Safari에서 필수
   }catch(e){
     alert('Camera access denied or not available');
     console.error(e);
