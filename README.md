@@ -1,6 +1,6 @@
 # CAJGHN
 
-![Website](https://img.shields.io/badge/website-cajghn.com-blue)
+[![Website](https://img.shields.io/badge/website-cajghn.com-blue)](https://cajghn.com)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 Welcome to **CAJGHN**!  
