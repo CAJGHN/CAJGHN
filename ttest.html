@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive Glass UI</title>
+<style>
+html, body {
+  margin:0;
+  height:100%;
+  overflow:hidden;
+  font-family:sans-serif;
+  background:#000;
+}
+
+video#bgVideo {
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  z-index:-2;
+  filter: brightness(0.85);
+}
+
+.glass-card {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  border-radius:20px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.3);
+  color:white;
+  text-align:center;
+  transition: transform 0.05s linear, box-shadow 0.05s linear;
+  z-index:2;
+}
+
+button {
+  padding:10px 15px;
+  border:none;
+  border-radius:10px;
+  background: rgba(255,255,255,0.3);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition: background 0.2s;
+}
+button:hover {
+  background: rgba(255,255,255,0.5);
+}
+
+canvas#particles {
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  z-index:-1;
+  pointer-events:none;
+}
+
+#start {
+  position:absolute;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:10px 20px;
+  font-size:16px;
+  z-index:3;
+}
+</style>
+</head>
+<body>
+
+<video id="bgVideo" autoplay muted playsinline></video>
+<canvas id="particles"></canvas>
+
+<div class="glass-card" id="card">
+  <h2>Interactive Glass UI</h2>
+  <button>Action 1</button>
+  <button>Action 2</button>
+</div>
+
+<button id="start">Enable Motion & Camera</button>
+
+<script>
+const card = document.getElementById('card');
+const video = document.getElementById('bgVideo');
+const startBtn = document.getElementById('start');
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+
+let width = window.innerWidth;
+let height = window.innerHeight;
+canvas.width = width;
+canvas.height = height;
+
+// 파티클 배열
+const particles = [];
+const particleCount = 50;
+for(let i=0;i<particleCount;i++){
+  particles.push({
+    x: Math.random()*width,
+    y: Math.random()*height,
+    size: Math.random()*4+1,
+    dx: 0,
+    dy: 0
+  });
+}
+
+// resize
+window.addEventListener('resize', ()=>{
+  width = window.innerWidth;
+  height = window.innerHeight;
+  canvas.width = width;
+  canvas.height = height;
+});
+
+// tilt 반영
+let tiltX=0, tiltY=0;
+
+function updateTilt(beta, gamma){
+  tiltX = gamma || 0;
+  tiltY = beta || 0;
+
+  const maxRotate = 25;
+  const x = Math.max(Math.min(gamma/90*maxRotate, maxRotate), -maxRotate);
+  const y = Math.max(Math.min(beta/90*maxRotate, maxRotate), -maxRotate);
+
+  card.style.transform = `translate(-50%, -50%) rotateY(${x}deg) rotateX(${-y}deg)`;
+
+  // 그림자 강도
+  const shadowIntensity = Math.min(Math.abs(x)+Math.abs(y), 50);
+  card.style.boxShadow = `0 20px ${40+shadowIntensity}px rgba(255,255,255,0.3)`;
+
+  // 파티클 속도 반영
+  particles.forEach(p=>{
+    p.dx = x*0.2*(Math.random()+0.5);
+    p.dy = -y*0.2*(Math.random()+0.5);
+  });
+}
+
+// 카메라 접근
+async function enableCamera(){
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}, audio:false});
+    video.srcObject = stream;
+  }catch(e){
+    alert('Camera access denied');
+    console.error(e);
+  }
+}
+
+// 파티클 그리기
+function animateParticles(){
+  ctx.clearRect(0,0,width,height);
+  particles.forEach(p=>{
+    p.x += p.dx;
+    p.y += p.dy;
+
+    // 화면 밖이면 반대쪽으로
+    if(p.x>width) p.x=0;
+    if(p.x<0) p.x=width;
+    if(p.y>height) p.y=0;
+    if(p.y<0) p.y=height;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.fill();
+  });
+  requestAnimationFrame(animateParticles);
+}
+
+startBtn.addEventListener('click', async ()=>{
+  enableCamera();
+  if(typeof DeviceOrientationEvent.requestPermission==='function'){
+    DeviceOrientationEvent.requestPermission().then(state=>{
+      if(state==='granted'){
+        window.addEventListener('deviceorientation', e=>updateTilt(e.beta||0,e.gamma||0));
+      }else{ alert('Motion permission denied'); }
+    }).catch(console.error);
+  }else{
+    window.addEventListener('deviceorientation', e=>updateTilt(e.beta||0,e.gamma||0));
+  }
+  startBtn.style.display='none';
+  animateParticles();
+});
+</script>
+
+</body>
+</html>
