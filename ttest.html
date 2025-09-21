@@ -101,7 +101,7 @@ let height = window.innerHeight;
 canvas.width = width;
 canvas.height = height;
 
-// 파티클 배열
+// 파티클 초기화
 const particles = [];
 const particleCount = 50;
 for(let i=0;i<particleCount;i++){
@@ -109,12 +109,12 @@ for(let i=0;i<particleCount;i++){
     x: Math.random()*width,
     y: Math.random()*height,
     size: Math.random()*4+1,
-    dx: 0,
-    dy: 0
+    dx:0,
+    dy:0
   });
 }
 
-// resize
+// 창 크기 변경
 window.addEventListener('resize', ()=>{
   width = window.innerWidth;
   height = window.innerHeight;
@@ -124,7 +124,6 @@ window.addEventListener('resize', ()=>{
 
 // tilt 반영
 let tiltX=0, tiltY=0;
-
 function updateTilt(beta, gamma){
   tiltX = gamma || 0;
   tiltY = beta || 0;
@@ -135,11 +134,9 @@ function updateTilt(beta, gamma){
 
   card.style.transform = `translate(-50%, -50%) rotateY(${x}deg) rotateX(${-y}deg)`;
 
-  // 그림자 강도
-  const shadowIntensity = Math.min(Math.abs(x)+Math.abs(y), 50);
+  const shadowIntensity = Math.min(Math.abs(x)+Math.abs(y),50);
   card.style.boxShadow = `0 20px ${40+shadowIntensity}px rgba(255,255,255,0.3)`;
 
-  // 파티클 속도 반영
   particles.forEach(p=>{
     p.dx = x*0.2*(Math.random()+0.5);
     p.dy = -y*0.2*(Math.random()+0.5);
@@ -151,6 +148,8 @@ async function enableCamera(){
   try{
     const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}, audio:false});
     video.srcObject = stream;
+    video.muted = true;
+    await video.play(); // iOS에서 확실히 재생
   }catch(e){
     alert('Camera access denied');
     console.error(e);
@@ -164,20 +163,20 @@ function animateParticles(){
     p.x += p.dx;
     p.y += p.dy;
 
-    // 화면 밖이면 반대쪽으로
     if(p.x>width) p.x=0;
     if(p.x<0) p.x=width;
     if(p.y>height) p.y=0;
     if(p.y<0) p.y=height;
 
     ctx.beginPath();
-    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
+    ctx.arc(p.x, p.y, p.size,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.7)';
     ctx.fill();
   });
   requestAnimationFrame(animateParticles);
 }
 
+// 시작 버튼 클릭
 startBtn.addEventListener('click', async ()=>{
   enableCamera();
   if(typeof DeviceOrientationEvent.requestPermission==='function'){
