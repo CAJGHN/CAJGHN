@@ -5,26 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CAJGHN Crypto</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.min.js"></script>
 <style>
 html, body { height:100%; margin:0; padding:0; background:#1e1e2f; color:#f5f5f5; font-family:sans-serif; }
 body { display:flex; justify-content:center; align-items:center; flex-direction:column; }
 .container { display:flex; flex-direction:column; align-items:center; width:100%; max-width:1200px; padding:1rem; box-sizing:border-box; text-align:center; }
-.header { display:flex; justify-content:space-between; align-items:center; width:100%; max-width:1200px; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem; }
+.header { display:flex; justify-content:center; align-items:center; width:100%; max-width:1200px; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem; }
 .clock { font-weight:bold; font-size:clamp(1rem,3vw,1.5rem); }
-.wallet-area { text-align:right; font-size:clamp(0.9rem,2.5vw,1.2rem); }
 .prices-container { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; width:100%; margin-bottom:1rem; }
 .price-card { background:#2a2a3d; border-radius:1rem; flex:1 1 0; display:flex; flex-direction:column; justify-content:center; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.3); padding:1rem; min-width:200px; transition: all 0.3s; }
 .price-card h2 { margin-bottom:0.25rem; word-break:break-word; font-size:clamp(1.2rem,4vw,2rem); }
 .price-card p { margin:0.25rem 0; font-size:clamp(1rem,3vw,1.2rem); }
-.wallet-info { font-size:clamp(1rem,3vw,1.2rem); margin-bottom:1rem; }
 footer { margin-top:2rem; text-align:center; font-size:clamp(0.9rem,2.5vw,1.2rem); }
 .wallet-address { text-decoration:underline; cursor:pointer; }
-button { cursor:pointer; }
 @media (max-width:1024px){
   .prices-container{ flex-direction:column; gap:1rem; }
   .header{ flex-direction:column; align-items:center; }
-  .wallet-area{text-align:center;}
 }
 </style>
 </head>
@@ -32,10 +27,6 @@ button { cursor:pointer; }
 <div class="container">
   <div class="header">
     <h1 style="font-size: clamp(2rem,5vw,4rem); font-weight:bold;">CAJGHN Crypto</h1>
-    <div class="wallet-area">
-      <span id="walletInfo">Wallet: Not connected</span>
-      <button id="connectBtn" class="ml-2 px-2 py-1 bg-blue-600 rounded hover:bg-blue-700">Connect</button>
-    </div>
   </div>
 
   <div class="clock" id="clock"></div>
@@ -99,43 +90,6 @@ async function fetchPrices(){
 }
 fetchPrices();
 setInterval(fetchPrices,5000);
-
-let provider, signer, walletAddr;
-const walletInfo = document.getElementById('walletInfo');
-const connectBtn = document.getElementById('connectBtn');
-
-async function connectWallet(){
-  if(window.ethereum){
-    try{
-      provider = new ethers.BrowserProvider(window.ethereum, "homestead");
-      await provider.send("eth_requestAccounts", []);
-      signer = await provider.getSigner();
-      walletAddr = await signer.getAddress();
-      const balance = await signer.getBalance();
-      const eth = ethers.formatEther(balance).toFixed(5);
-      walletInfo.innerHTML = `<span class="wallet-address" onclick="window.open('https://etherscan.io/address/${walletAddr}','_blank')">${walletAddr}</span>: ${eth} ETH`;
-      connectBtn.textContent = "Disconnect";
-    }catch(err){console.error(err);}
-  } else {
-    alert("MetaMask not detected!");
-  }
-}
-
-function disconnectWallet(){
-  walletAddr = null;
-  signer = null;
-  provider = null;
-  walletInfo.textContent = "Wallet: Not connected";
-  connectBtn.textContent = "Connect";
-}
-
-connectBtn.addEventListener('click', async ()=>{
-  if(connectBtn.textContent==="Connect"){
-    await connectWallet();
-  } else {
-    disconnectWallet();
-  }
-});
 </script>
 </body>
 </html>
