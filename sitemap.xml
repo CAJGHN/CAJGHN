@@ -3,31 +3,37 @@
 
   <url>
     <loc>https://cajghn.com/</loc>
-    <lastmod>2025-09-17</lastmod>
+    <lastmod>2025-09-29</lastmod>
     <priority>1.0</priority>
   </url>
 
   <url>
     <loc>https://cajghn.com/studio</loc>
-    <lastmod>2025-09-17</lastmod>
+    <lastmod>2025-09-29</lastmod>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://cajghn.com/arcade</loc>
-    <lastmod>2025-09-17</lastmod>
+    <lastmod>2025-09-29</lastmod>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://cajghn.com/lounge</loc>
-    <lastmod>2025-09-17</lastmod>
+    <lastmod>2025-09-29</lastmod>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://cajghn.com/news</loc>
-    <lastmod>2025-09-17</lastmod>
+    <lastmod>2025-09-29</lastmod>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://cajghn.com/crypto</loc>
+    <lastmod>2025-09-29</lastmod>
     <priority>0.8</priority>
   </url>
 
