@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>학생용 코인 거래소</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;900&display=swap');
+body { font-family: 'Nanum Gothic', sans-serif; background: #e0f7e9; color: #111; margin: 0; }
+h1,h2,h3,p,li { font-family: 'Nanum Gothic', sans-serif; border-radius: 9999px; }
+
+.hero-bg { background: linear-gradient(135deg, #d0f0c0, #66bb6a); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; position: relative; overflow: hidden; }
+.hero-bg::before { content: ''; position: absolute; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(255,255,255,0.15), transparent 60%); animation: rotateBG 20s linear infinite; top: -50%; left: -50%; }
+@keyframes rotateBG { from {transform: rotate(0deg);} to {transform: rotate(360deg);} }
+.hero-title { color: #1b5e20; font-size: 4rem; font-weight: 900; margin-bottom: 1rem; opacity: 0; text-shadow: 2px 2px 6px rgba(0,0,0,0.2); }
+.hero-subtitle { color: #2e7d32; font-size: 1.5rem; margin-bottom: 3rem; max-width: 600px; opacity: 0; line-height: 1.6; font-weight: 700; text-shadow: 1px 1px 4px rgba(0,0,0,0.1); }
+.down-arrow { position: absolute; bottom: 20px; font-size: 3rem; color: white; animation: bounce 0.6s infinite; }
+@keyframes bounce { 0%,20%,50%,80%,100%{transform:translateY(0);}40%{transform:translateY(15px);}60%{transform:translateY(8px);} }
+
+.features-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 2rem; margin-bottom: 5rem; }
+.feature-card { background: linear-gradient(145deg, #e6f4ea, #c8e6c9); border-radius: 1.5rem; box-shadow: 0 15px 35px rgba(0,0,0,0.15); transition: transform 0.5s ease, box-shadow 0.5s ease; padding: 2rem; display: flex; flex-direction: column; flex: 1 1 300px; min-height: 280px; }
+.feature-card:hover { transform: translateY(-12px) scale(1.06); box-shadow: 0 25px 50px rgba(0,0,0,0.25); }
+.section-title { position: relative; display: inline-block; }
+.section-title::after { content: ''; position: absolute; width: 50%; height: 4px; background: linear-gradient(to right,#a5d6a7,#4caf50); bottom: -10px; left: 25%; border-radius: 2px; }
+.fixed-telegram { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; border-radius: 50%; box-shadow: 0 8px 20px rgba(0,0,0,0.3); z-index: 1000; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.fixed-telegram img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.fixed-telegram:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 12px 30px rgba(0,0,0,0.35); }
+footer { background: linear-gradient(135deg, #a5d6a7, #4caf50); color: white; text-align: center; padding: 3rem 1rem; font-weight: bold; display: flex; flex-direction: column; gap: 0.5rem; position: relative; z-index: 10; }
+footer a { color: white; text-decoration: underline; }
+@media (max-width:768px){
+.hero-title { font-size: 2.5rem; }
+.hero-subtitle { font-size: 1rem; max-width: 90%; }
+.feature-card { padding: 1.2rem; flex: 1 1 100%; min-height: auto; }
+.section-title { font-size: 1.5rem; }
+.down-arrow { font-size: 2rem; }
+.features-container { flex-direction: column; margin-bottom: 8rem; }
+}
+</style>
+</head>
+<body>
+<section class="hero-bg">
+  <h1 class="hero-title">학생용 코인 거래소</h1>
+  <p class="hero-subtitle">학생들은 기존 거래소를 이용할 수 없어 코인을 경험할 수 없습니다. 이를 위해 만들어진 학생용 코인 거래소는, 학생들이 <strong>USDC</strong>를 안전하게 투자, 자산 관리, 디지털 금융 경험을 할 수 있는 환경을 제공합니다.</p>
+  <div class="down-arrow">&#x2193;</div>
+</section>
+
+<section class="py-24 px-6 md:px-20 bg-gray-50">
+  <h2 class="text-4xl font-bold text-center mb-16 section-title">거래소 특징</h2>
+  <div class="features-container">
+    <div class="feature-card">
+      <h3 class="text-2xl font-semibold mb-4 text-green-700">학생 인증 절차</h3>
+      <ul class="text-gray-700 list-disc list-inside space-y-2">
+        <li>학생증을 준비합니다.</li>
+        <li>종이에 다음 문구를 자필로 작성합니다: "나는 자발적으로 학생용 코인 거래소에서 거래한다" (날짜와 이름 포함 필수)</li>
+        <li>학생증과 종이를 동시에 들고 얼굴이 나오도록 사진 촬영</li>
+        <li>사진을 텔레그램으로 제출 후 학생 인증 완료</li>
+      </ul>
+    </div>
+    <div class="feature-card">
+      <h3 class="text-2xl font-semibold mb-4 text-green-700">거래 방식</h3>
+      <ul class="text-gray-700 list-disc list-inside space-y-2">
+        <li>인증된 회원은 운영자로부터 <strong>USDC</strong>를 구매할 수 있습니다.</li>
+        <li>입금은 <strong>카카오뱅크 미니</strong>로만 가능합니다.</li>
+        <li>계좌 예금주명과 학생 본인의 이름이 일치해야 거래가 승인됩니다.</li>
+      </ul>
+    </div>
+    <div class="feature-card">
+      <h3 class="text-2xl font-semibold mb-4 text-green-700">학생 전용 코인 경험</h3>
+      <p class="text-gray-700">이 거래소는 코인을 하고 싶어도 기존 거래소를 이용할 수 없는 학생들을 위해 만들어졌습니다. 안전하게 <strong>USDC</strong> 투자와 자산 관리 경험을 쌓고 디지털 금융 환경을 배우며, 학생 맞춤형 지원으로 코인 경험을 제공합니다.</p>
+    </div>
+  </div>
+</section>
+
+<a href="https://t.me/cajghn" target="_blank" class="fixed-telegram"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram"></a>
+
+<footer>
+  <p>Business inquiries: <a href="mailto:cajghn@gmail.com">cajghn@gmail.com</a></p>
+  <p>Copyright © 2025 CAJGHN. All Rights Reserved.</p>
+</footer>
+
+<script>
+gsap.to('.hero-title', {opacity:1, y:0, duration:1.2, ease:'power3.out'});
+gsap.to('.hero-subtitle', {opacity:1, y:0, duration:1.2, delay:0.3, ease:'power3.out'});
+</script>
+</body>
+</html>
