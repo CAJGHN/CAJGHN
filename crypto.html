@@ -11,6 +11,7 @@ body { display:flex; justify-content:center; align-items:center; flex-direction:
 .container { display:flex; flex-direction:column; align-items:center; width:100%; max-width:1200px; padding:1rem; box-sizing:border-box; text-align:center; }
 .header { display:flex; justify-content:center; align-items:center; width:100%; max-width:1200px; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem; }
 .clock { font-weight:bold; font-size:clamp(1rem,3vw,1.5rem); }
+.wallet-balance { margin:0.5rem 0 1rem 0; font-size:clamp(1rem,3vw,1.5rem); }
 .prices-container { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; width:100%; margin-bottom:1rem; }
 .price-card { background:#2a2a3d; border-radius:1rem; flex:1 1 0; display:flex; flex-direction:column; justify-content:center; align-items:center; box-shadow:0 4px 12px rgba(0,0,0,0.3); padding:1rem; min-width:200px; transition: all 0.3s; }
 .price-card h2 { margin-bottom:0.25rem; word-break:break-word; font-size:clamp(1.2rem,4vw,2rem); }
@@ -28,9 +29,8 @@ footer { margin-top:2rem; text-align:center; font-size:clamp(0.9rem,2.5vw,1.2rem
   <div class="header">
     <h1 style="font-size: clamp(2rem,5vw,4rem); font-weight:bold;">CAJGHN Crypto</h1>
   </div>
-
+  <div class="wallet-balance" id="ethBalance">CAJGHN Wallet : Loading...</div>
   <div class="clock" id="clock"></div>
-  
   <div class="prices-container">
     <div class="price-card" id="btcCard">
       <h2 id="btcPrice">BTC: Loading...</h2>
@@ -46,12 +46,10 @@ footer { margin-top:2rem; text-align:center; font-size:clamp(0.9rem,2.5vw,1.2rem
     </div>
   </div>
 </div>
-
 <footer>
   <div>Support us: <span id="sponsorAddress" class="wallet-address">0xcfe928De9F78d06dd21B46C006f65a2DdBcdA195</span></div>
   <div>Copyright © 2025 CAJGHN. All Rights Reserved.</div>
 </footer>
-
 <script>
 function updateClock(){
   const now = new Date();
@@ -66,12 +64,29 @@ function updateClock(){
 }
 setInterval(updateClock,1000);
 updateClock();
-
 document.getElementById('sponsorAddress').addEventListener('click', function(){
   const sponsorAddr = '0xcfe928De9F78d06dd21B46C006f65a2DdBcdA195';
   window.open('https://etherscan.io/address/'+sponsorAddr,'_blank');
 });
-
+const walletAddr = '0x9499dB4bC22482649d666ca31EE1C10d4712CC57';
+const apiKey = '1SY82M313ZV25EBJZJRUZ9PJW1QMCHZM1I';
+async function fetchWalletBalance(){
+  try{
+    const ethRes = await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=account&action=balance&address=${walletAddr}&apikey=${apiKey}`);
+    const ethData = await ethRes.json();
+    const wei = ethData.result;
+    const eth = parseFloat(wei / 1e18);
+    const priceRes = await fetch('https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT');
+    const priceData = await priceRes.json();
+    const ethPrice = parseFloat(priceData.price);
+    const usdValue = eth * ethPrice;
+    document.getElementById('ethBalance').textContent = `CAJGHN Wallet : ${eth.toFixed(5)} ETH ($${usdValue.toLocaleString()})`;
+  }catch(e){
+    document.getElementById('ethBalance').textContent = 'CAJGHN Wallet : Error loading balance';
+  }
+}
+fetchWalletBalance();
+setInterval(fetchWalletBalance,60000);
 async function fetchPrices(){
   try{
     const res = await fetch('https://api.binance.com/api/v3/ticker/24hr');
@@ -86,7 +101,7 @@ async function fetchPrices(){
         document.getElementById(coins[c][1]).style.color=change>=0?'#22c55e':'#ef4444';
       }
     }
-  }catch(e){console.error(e);}
+  }catch(e){}
 }
 fetchPrices();
 setInterval(fetchPrices,5000);
