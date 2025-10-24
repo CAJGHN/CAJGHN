@@ -1,404 +1,165 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CAJGHN Arcade</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-body {
-  margin: 0;
-  overflow: hidden;
-  background: #000;
-  font-family: sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 20px;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-#game-container {
-  position: relative;
-  width: 400px;
-  max-width: 95vw;
-  height: 600px;
-  background: #111;
-  border: 3px solid #00ff7f;
-  overflow: hidden;
-}
-#player {
-  position: absolute;
-  bottom: 20px;
-  left: 180px;
-  width: 40px;
-  height: 40px;
-  background: #00ff7f;
-  border-radius: 50%;
-}
-#scoreboard {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  color: #00ff7f;
-  font-size: 1.6rem;
-  text-shadow: 0 0 8px #00ff7f, 0 0 16px #00ff7f;
-}
-#playerName {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: #00ff7f;
-  font-size: 1.2rem;
-}
-#overlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.8);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #00ff7f;
-  font-size: 2.5rem;
-  z-index: 10;
-  font-weight: bold;
-  text-align: center;
-}
-.touch-btn {
-  position: absolute;
-  bottom: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: rgba(0,255,127,0.2);
-  border: 2px solid #00ff7f;
-  color: #00ff7f;
-  font-size: 2.2rem;
-  text-align: center;
-  line-height: 56px;
-  font-weight: bold;
-  user-select: none;
-}
-#left-btn { left: 20px; transform: rotate(-90deg); }
-#right-btn { right: 20px; transform: rotate(90deg); }
-#leaderboard-container {
-  background: #111;
-  border: 3px solid #00ff7f;
-  color: #00ff7f;
-  padding: 14px;
-  width: 280px;
-  max-height: 600px;
-  font-size: 1.3rem;
-  line-height: 1.6rem;
-  overflow-y: auto;
-  text-align: left;
-}
-#leaderboard-title {
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 10px;
-  font-size: 1.6rem;
-}
-#refresh-btn {
-  margin-top: 12px;
-  padding: 8px 14px;
-  background: #00ff7f;
-  color: #000;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  transition: background .15s, transform .06s;
-}
-#refresh-btn:active { transform: scale(.98); }
-#start-form {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-}
-#name-input {
-  padding: 6px;
-  border-radius: 4px;
-  border: 1px solid #00ff7f;
-  background: #111;
-  color: #00ff7f;
-  width: 150px;
-  text-align: center;
-  font-size: 1rem;
-}
-#start-btn {
-  background: #00ff7f;
-  color: #000;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CAJGHN Arade</title>
+  <style>
+    html,body{height:100%;margin:0;background:#000;color:#fff;font-family:Inter,system-ui,Arial}
+    .wrap{display:flex;flex-direction:column;height:100vh}
+    header{padding:10px 14px;background:#000;display:flex;align-items:center;gap:12px}
+    header h1{font-size:16px;margin:0}
+    #game-container{flex:1;display:flex;align-items:center;justify-content:center}
+    canvas{background:#111;width:100%;max-width:1100px;height:calc(100vh - 70px);box-shadow:0 10px 30px rgba(0,0,0,0.6);border-radius:8px}
+    .hud{position:absolute;right:16px;top:16px;color:#fff;font-size:14px}
+  </style>
 </head>
 <body>
-  <div id="game-container">
-    <div id="scoreboard">
-      <div id="score">Score: 0</div>
+  <div class="wrap">
+    <header>
+      <h1>CAJGHN Arade</h1>
+    </header>
+
+    <div id="game-container">
+      <canvas id="game"></canvas>
+      <div class="hud" id="hud"></div>
     </div>
-    <div id="playerName"></div>
-
-    <div id="player"></div>
-    <div id="overlay"></div>
-
-    <div id="left-btn" class="touch-btn">▲</div>
-    <div id="right-btn" class="touch-btn">▲</div>
   </div>
 
-  <div id="leaderboard-container">
-    <div id="leaderboard-title">Leaderboard</div>
-    <div id="leaderboardList">Loading...</div>
-    <button id="refresh-btn">Refresh</button>
-  </div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import { getDatabase, ref, push, query, orderByChild, limitToLast, get }
-  from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyAS5OwF0mHyIbq0AKNrY3c8K3yTrUubdDc",
-  authDomain: "game-715ed.firebaseapp.com",
-  projectId: "game-715ed",
-  storageBucket: "game-715ed.firebasestorage.app",
-  messagingSenderId: "1074016214448",
-  appId: "1:1074016214448:web:d82612cbf2764fcf168a75",
-  databaseURL: "https://game-715ed-default-rtdb.firebaseio.com"
+<script>
+const canvas=document.getElementById('game');
+const ctx=canvas.getContext('2d');
+let W=1000,H=700;
+function resize(){
+  const ratio=window.devicePixelRatio||1;
+  const maxW=Math.min(window.innerWidth-40,1100);
+  const maxH=window.innerHeight-120;
+  W=Math.max(700,Math.min(maxW,1100));
+  H=Math.max(520,Math.min(maxH,800));
+  canvas.width=Math.floor(W*ratio);
+  canvas.height=Math.floor(H*ratio);
+  canvas.style.width=W+'px';
+  canvas.style.height=H+'px';
+  ctx.setTransform(ratio,0,0,ratio,0,0);
+}
+window.addEventListener('resize',resize);
+resize();
+const state={
+  keys:{},
+  player:{x:W/2,y:H*0.6,vx:0,vy:0,speed:180,hp:5,score:0,alive:true,invincible:3},
+  objects:[],
+  lastTime:0,
+  paused:false,
+  started:false
 };
-
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
-
-const player = document.getElementById('player');
-const gameContainer = document.getElementById('game-container');
-const scoreEl = document.getElementById('score');
-const overlay = document.getElementById('overlay');
-const leftBtn = document.getElementById('left-btn');
-const rightBtn = document.getElementById('right-btn');
-const nameEl = document.getElementById('playerName');
-const leaderboardList = document.getElementById('leaderboardList');
-const refreshBtn = document.getElementById('refresh-btn');
-
-let playerName = '';
-let playerX = 180;
-let obstacles = [];
-let score = 0;
-let speed = 2;
-let gameRunning = false;
-let gameLoopId;
-let leftPressed = false;
-let rightPressed = false;
-let turn = 0;
-let obstaclesPerTurn = 1;
-let turnInterval;
-
-function showNameInput() {
-  overlay.innerHTML = `
-    <form id="start-form">
-      <input id="name-input" type="text" placeholder="Enter nickname" required />
-      <button id="start-btn" type="submit">Start Game</button>
-    </form>`;
-  overlay.style.display = 'flex';
-
-  const form = document.getElementById('start-form');
-  form.addEventListener('submit', e => {
-    e.preventDefault();
-    const input = document.getElementById('name-input');
-    playerName = input.value.trim() || "Player";
-    nameEl.textContent = playerName;
-    countdownStart();
-  });
-}
-
-function spawnObstacle() {
-  const obs = document.createElement('div');
-  obs.classList.add('obstacle');
-  obs.style.left = Math.random() * (gameContainer.clientWidth - 40) + 'px';
-  obs.style.top = '-50px';
-  obs.style.position = 'absolute';
-  obs.style.width = '40px';
-  obs.style.height = '40px';
-  obs.style.background = 'red';
-  gameContainer.appendChild(obs);
-  obstacles.push(obs);
-}
-
-function runTurn() {
-  turn++;
-  for (let i = 0; i < obstaclesPerTurn; i++) {
-    const delay = Math.random() * 1500;
-    setTimeout(spawnObstacle, delay);
-  }
-  if (turn % 3 === 0) obstaclesPerTurn++;
-  if (turn % 6 === 0) speed += 0.5;
-}
-
-function moveObstacles() {
-  obstacles.forEach((obs, idx) => {
-    let top = parseFloat(obs.style.top) + speed;
-    obs.style.top = top + 'px';
-    if (top > gameContainer.clientHeight) {
-      obs.remove();
-      obstacles.splice(idx, 1);
-      score++;
-      scoreEl.textContent = "Score: " + score;
-    }
-    const pRect = player.getBoundingClientRect();
-    const oRect = obs.getBoundingClientRect();
-    if (!(pRect.right < oRect.left || pRect.left > oRect.right || pRect.bottom < oRect.top || pRect.top > oRect.bottom)) {
-      endGame();
-    }
-  });
-}
-
-function gameLoop() {
-  if (!gameRunning) return;
-  if (leftPressed)  playerX -= 5;
-  if (rightPressed) playerX += 5;
-  playerX = Math.max(0, Math.min(playerX, gameContainer.clientWidth - 40));
-  player.style.left = playerX + 'px';
-  moveObstacles();
-  gameLoopId = requestAnimationFrame(gameLoop);
-}
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowLeft')  leftPressed = true;
-  if (e.key === 'ArrowRight') rightPressed = true;
+function rand(a,b){return Math.random()*(b-a)+a}
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+window.addEventListener('keydown',e=>{
+  if(!state.started){state.started=true;return;}
+  state.keys[e.key.toLowerCase()]=true;
+  if(e.key==='r'||e.key==='R') restart();
 });
-document.addEventListener('keyup', e => {
-  if (e.key === 'ArrowLeft')  leftPressed = false;
-  if (e.key === 'ArrowRight') rightPressed = false;
-});
-
-leftBtn.onmousedown = () => leftPressed = true;
-leftBtn.onmouseup = () => leftPressed = false;
-leftBtn.ontouchstart = e => { e.preventDefault(); leftPressed = true; };
-leftBtn.ontouchend = () => leftPressed = false;
-
-rightBtn.onmousedown = () => rightPressed = true;
-rightBtn.onmouseup = () => rightPressed = false;
-rightBtn.ontouchstart = e => { e.preventDefault(); rightPressed = true; };
-rightBtn.ontouchend = () => rightPressed = false;
-
-function startGame() {
-  overlay.style.display = 'none';
-  obstacles.forEach(o => o.remove());
-  obstacles = [];
-  playerX = 180;
-  score = 0;
-  speed = 2;
-  turn = 0;
-  obstaclesPerTurn = 1;
-  scoreEl.textContent = "Score: 0";
-  gameRunning = true;
-  turnInterval = setInterval(runTurn, 2000);
-  gameLoop();
+window.addEventListener('keyup',e=>{state.keys[e.key.toLowerCase()]=false;});
+function spawnPickup(x,y){state.objects.push({type:'pickup',x,y,r:10,collected:false});}
+function spawnEnemy(x,y){state.objects.push({type:'enemy',x,y,w:36,h:48,dir:Math.random()<0.5?-1:1,speed:40+Math.random()*40,vyDir:Math.random()<0.5?-1:1,vySpeed:20+Math.random()*30,hp:1});}
+function initMap(){
+  state.objects=[];
+  for(let i=0;i<10;i++)spawnPickup(rand(80,W-80),rand(120,H-120));
+  for(let i=0;i<5;i++)spawnEnemy(rand(80,W-80),rand(120,H-120));
+  const p=state.player;
+  p.x=W/2;p.y=H*0.6;p.hp=5;p.score=0;p.alive=true;p.invincible=3;
+  state.paused=false;
 }
+initMap();
+function restart(){initMap();}
+function update(dt){
+  if(!state.started||state.paused)return;
+  const p=state.player;
+  let ax=0,ay=0;
+  if(state.keys['arrowleft']||state.keys['a'])ax-=1;
+  if(state.keys['arrowright']||state.keys['d'])ax+=1;
+  if(state.keys['arrowup']||state.keys['w'])ay-=1;
+  if(state.keys['arrowdown']||state.keys['s'])ay+=1;
+  const len=Math.hypot(ax,ay)||1;
+  p.vx=(ax/len)*p.speed;
+  p.vy=(ay/len)*p.speed;
+  p.x+=p.vx*dt;p.y+=p.vy*dt;
+  p.x=Math.max(40,Math.min(W-40,p.x));
+  p.y=Math.max(80,Math.min(H-40,p.y));
 
-function countdownStart() {
-  let count = 3;
-  overlay.style.display = 'flex';
-  overlay.textContent = count;
-  const interval = setInterval(() => {
-    count--;
-    if (count > 0) {
-      overlay.textContent = count;
-    } else {
-      clearInterval(interval);
-      startGame();
-    }
-  }, 1000);
-}
+  if(p.invincible>0)p.invincible-=dt;
 
-async function updateLeaderboard() {
-  refreshBtn.disabled = true;
-  const oldText = refreshBtn.textContent;
-  refreshBtn.textContent = 'Loading...';
-  leaderboardList.innerHTML = 'Loading...';
-  try {
-    const topScoresQuery = query(ref(db, 'scores'), orderByChild('score'), limitToLast(20));
-    const snap = await get(topScoresQuery);
-    let arr = [];
-    snap.forEach(child => {
-      const v = child.val();
-      if (v) {
-        if (typeof v.score === 'string' && !isNaN(Number(v.score))) v.score = Number(v.score);
-        arr.push(v);
+  for(const o of state.objects){
+    if(o.type==='enemy'){
+      o.x+=o.dir*o.speed*dt;o.y+=o.vyDir*o.vySpeed*dt;
+      if(o.x<60||o.x>W-60)o.dir*=-1;
+      if(o.y<120||o.y>H-120)o.vyDir*=-1;
+      if(dist(p,o)<28+(o.w/2)){
+        if(p.invincible<=0 && !o._hitTimer){
+          o._hitTimer=0.6;
+          p.hp-=1;
+          p.invincible=3;
+        }
       }
-    });
-    if (arr.length === 0) {
-      const allSnap = await get(ref(db, 'scores'));
-      let arr2 = [];
-      allSnap.forEach(c => {
-        const v = c.val();
-        if (v) {
-          if (typeof v.score === 'string' && !isNaN(Number(v.score))) v.score = Number(v.score);
-          arr2.push(v);
-        }
-      });
-      arr = arr2;
+      if(o._hitTimer){o._hitTimer-=dt;if(o._hitTimer<=0)o._hitTimer=0}
     }
-    arr.sort((a,b) => (b.score||0) - (a.score||0));
-    arr = arr.slice(0,20);
-    if (arr.length === 0) {
-      leaderboardList.innerHTML = 'No records';
-    } else {
-      leaderboardList.innerHTML = arr.map((e,i) => `${i+1}. ${e.name} - ${e.score}`).join('<br>');
-    }
-  } catch (err) {
-    console.error('Primary leaderboard update failed:', err);
-    try {
-      const allSnap = await get(ref(db, 'scores'));
-      let arr = [];
-      allSnap.forEach(c => {
-        const v = c.val();
-        if (v) {
-          if (typeof v.score === 'string' && !isNaN(Number(v.score))) v.score = Number(v.score);
-          arr.push(v);
-        }
-      });
-      arr.sort((a,b) => (b.score||0) - (a.score||0));
-      arr = arr.slice(0,20);
-      leaderboardList.innerHTML = arr.length ? arr.map((e,i) => `${i+1}. ${e.name} - ${e.score}`).join('<br>') : 'No records';
-    } catch (err2) {
-      console.error('Fallback leaderboard update also failed:', err2);
-      leaderboardList.innerHTML = 'Update failed';
-    }
-  } finally {
-    refreshBtn.disabled = false;
-    refreshBtn.textContent = oldText;
   }
+
+  for(const o of state.objects)if(o.type==='pickup'&&!o.collected)
+    if(dist(p,o)<30){
+      o.collected=true;state.player.score+=10;
+      spawnPickup(rand(80,W-80),rand(120,H-120));
+      if(state.player.score%100===0)spawnEnemy(rand(80,W-80),rand(120,H-120));
+    }
+
+  state.objects=state.objects.filter(o=>{if(o.type==='enemy')return o.hp>0;if(o.type==='pickup')return!o.collected;return true});
+  if(p.hp<=0){p.alive=false;p.hp=0;state.paused=true}
 }
-
-function saveScore() {
-  push(ref(db, 'scores'), { name: playerName, score: score });
-  updateLeaderboard();
+function render(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();ctx.fillStyle='#111';ctx.fillRect(0,0,W,H);ctx.restore();
+  if(!state.started){
+    ctx.fillStyle='#fff';ctx.font='24px system-ui';ctx.textAlign='center';
+    ctx.fillText('Press Any Key to Start',W/2,H/2);
+    ctx.textAlign='left';return;
+  }
+  const drawables=[];
+  for(const o of state.objects)drawables.push(o);
+  drawables.push({type:'player',x:state.player.x,y:state.player.y});
+  drawables.sort((a,b)=>(a.y||0)-(b.y||0));
+  for(const obj of drawables){
+    if(obj.type==='pickup'){
+      ctx.save();const s=1+(obj.y-H*0.4)/(H*0.6)*0.6;ctx.translate(obj.x,obj.y);ctx.scale(s,s);
+      ctx.beginPath();ctx.fillStyle='#999';ctx.arc(0,0,10,0,Math.PI*2);ctx.fill();ctx.restore();
+    }else if(obj.type==='enemy'){
+      const pLike={x:obj.x,y:obj.y};const scale=0.8+(obj.y-H*0.4)/(H*0.6)*0.9;
+      ctx.save();ctx.translate(pLike.x,pLike.y);
+      ctx.beginPath();ctx.fillStyle='rgba(0,0,0,0.45)';ctx.ellipse(0,18*scale,22*scale,8*scale,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.fillStyle='#666';ctx.arc(0,-6*scale,16*scale,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.fillStyle='#666';ctx.arc(0,-6*scale,8*scale,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#666';ctx.fillRect(-10*scale,6*scale,20*scale,12*scale);ctx.restore();
+    }else if(obj.type==='player'){
+      const p=state.player;const scale=0.8+(p.y-H*0.4)/(H*0.6)*0.9;
+      ctx.save();ctx.translate(p.x,p.y);
+      let visible=true;
+      if(p.invincible>0)visible=Math.floor(Date.now()/100)%2===0;
+      if(visible){
+        ctx.beginPath();ctx.fillStyle='rgba(0,0,0,0.45)';ctx.ellipse(0,18*scale,22*scale,8*scale,0,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.fillStyle='#eee';ctx.arc(0,-6*scale,16*scale,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.fillStyle='#eee';ctx.arc(0,-6*scale,8*scale,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#eee';ctx.fillRect(-10*scale,6*scale,20*scale,12*scale);
+      }
+      ctx.restore();
+    }
+  }
+  ctx.save();ctx.fillStyle='#fff';ctx.font='14px system-ui';ctx.textAlign='right';
+  ctx.fillText(`HP: ${state.player.hp}`,W-24,34);ctx.fillText(`Score: ${state.player.score}`,W-24,56);
+  ctx.restore();
+  if(state.paused){ctx.fillStyle='#fff';ctx.font='22px system-ui';ctx.textAlign='center';ctx.fillText('GAME OVER',W/2,H/2-5);ctx.font='14px system-ui';ctx.fillText('Press R to Restart',W/2,H/2+20);ctx.textAlign='left'}
 }
-
-function endGame() {
-  gameRunning = false;
-  clearInterval(turnInterval);
-  cancelAnimationFrame(gameLoopId);
-  saveScore();
-  overlay.textContent = `Game Over\nScore: ${score}\nPress F5 to restart`;
-  overlay.style.display = 'flex';
-}
-
-refreshBtn.addEventListener('click', updateLeaderboard);
-
-window.addEventListener('load', () => {
-  showNameInput();
-  updateLeaderboard();
-});
+function loop(timestamp){const dt=(timestamp-state.lastTime)/1000||0.016;state.lastTime=timestamp;update(dt);render();requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+const hud=document.getElementById('hud');hud.innerHTML=`Controls: WASD / ←↑→↓ — R to restart`;
 </script>
 </body>
 </html>
