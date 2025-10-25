@@ -9,20 +9,43 @@
     .wrap{display:flex;flex-direction:column;height:100vh}
     header{padding:10px 14px;background:#fff;display:flex;align-items:center;gap:12px;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
     header h1{font-size:16px;margin:0;color:#222}
-    #game-container{flex:1;display:flex;align-items:center;justify-content:center}
+    header .spacer{flex:1}
+    header .btn{background:#eee;color:#000;border:none;padding:8px 12px;border-radius:6px;font-size:13px;cursor:pointer;box-shadow:0 6px 14px rgba(0,0,0,0.05)}
+    header .btn:active{transform:translateY(1px)}
+    #game-container{flex:1;display:flex;align-items:center;justify-content:center;position:relative}
     canvas{background:#e6e6e6;width:100%;max-width:1100px;height:calc(100vh - 70px);box-shadow:0 10px 30px rgba(0,0,0,0.1);border-radius:8px}
     .hud{position:absolute;right:16px;top:16px;color:#333;font-size:14px}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:60}
+    .modal{background:#fff;border-radius:10px;padding:20px;max-width:740px;width:90%;box-shadow:0 20px 50px rgba(0,0,0,0.2);font-size:15px;color:#111}
+    .modal h2{margin:0 0 8px 0;font-size:18px}
+    .modal p{margin:8px 0;line-height:1.45}
+    .modal .close{margin-top:14px;display:inline-block;background:#eee;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <h1>CAJGHN Arade</h1>
+      <div class="spacer"></div>
+      <button class="btn" id="rulesBtn">Rules</button>
     </header>
 
     <div id="game-container">
       <canvas id="game"></canvas>
       <div class="hud" id="hud"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+      <h2 id="rulesTitle">Game Rules</h2>
+      <p>Controls: Move with WASD or arrow keys. Press R to restart the game.</p>
+      <p>Coins: Collect coins to increase your score. Each coin gives +10 points.</p>
+      <p>Enemies: Colliding with enemies reduces your HP by 1.</p>
+      <p>Scaling difficulty: Every time your score reaches a multiple of 100 points, one additional enemy is spawned.</p>
+      <p>Invincibility: When you reach each 100-point milestone you gain 1.5 seconds of invincibility. The game also grants 3 seconds of invincibility at the very start of a run.</p>
+      <p>Game Over: If your HP reaches 0 the game pauses and shows GAME OVER. Press R to restart.</p>
+      <button class="close" id="closeRules">Close</button>
     </div>
   </div>
 
@@ -58,6 +81,7 @@ window.addEventListener('keydown',e=>{
   if(!state.started){state.started=true;return;}
   state.keys[e.key.toLowerCase()]=true;
   if(e.key==='r'||e.key==='R') restart();
+  if(e.key==='Escape') hideRules();
 });
 window.addEventListener('keyup',e=>{state.keys[e.key.toLowerCase()]=false;});
 function spawnPickup(x,y){state.objects.push({type:'pickup',x,y,r:10,collected:false});}
@@ -166,7 +190,27 @@ function render(){
 }
 function loop(timestamp){const dt=(timestamp-state.lastTime)/1000||0.016;state.lastTime=timestamp;update(dt);render();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
-const hud=document.getElementById('hud');hud.innerHTML=`Controls: WASD / ←↑→↓ — R to restart`;
+
+const hud=document.getElementById('hud');hud.innerHTML='';
+
+const rulesBtn=document.getElementById('rulesBtn');
+const modalOverlay=document.getElementById('modalOverlay');
+const closeRules=document.getElementById('closeRules');
+
+function showRules(){
+  modalOverlay.style.display='flex';
+  modalOverlay.setAttribute('aria-hidden','false');
+}
+function hideRules(){
+  modalOverlay.style.display='none';
+  modalOverlay.setAttribute('aria-hidden','true');
+}
+
+rulesBtn.addEventListener('click',showRules);
+closeRules.addEventListener('click',hideRules);
+modalOverlay.addEventListener('click',e=>{
+  if(e.target===modalOverlay)hideRules();
+});
 </script>
 </body>
 </html>
