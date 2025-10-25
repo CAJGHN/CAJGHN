@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CAJGHN Arade</title>
   <style>
-    html,body{height:100%;margin:0;background:#000;color:#fff;font-family:Inter,system-ui,Arial}
+    html,body{height:100%;margin:0;background:#f2f2f2;color:#000;font-family:Inter,system-ui,Arial}
     .wrap{display:flex;flex-direction:column;height:100vh}
-    header{padding:10px 14px;background:#000;display:flex;align-items:center;gap:12px}
-    header h1{font-size:16px;margin:0}
+    header{padding:10px 14px;background:#fff;display:flex;align-items:center;gap:12px;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+    header h1{font-size:16px;margin:0;color:#222}
     #game-container{flex:1;display:flex;align-items:center;justify-content:center}
-    canvas{background:#111;width:100%;max-width:1100px;height:calc(100vh - 70px);box-shadow:0 10px 30px rgba(0,0,0,0.6);border-radius:8px}
-    .hud{position:absolute;right:16px;top:16px;color:#fff;font-size:14px}
+    canvas{background:#e6e6e6;width:100%;max-width:1100px;height:calc(100vh - 70px);box-shadow:0 10px 30px rgba(0,0,0,0.1);border-radius:8px}
+    .hud{position:absolute;right:16px;top:16px;color:#333;font-size:14px}
   </style>
 </head>
 <body>
@@ -98,7 +98,7 @@ function update(dt){
         if(p.invincible<=0 && !o._hitTimer){
           o._hitTimer=0.6;
           p.hp-=1;
-          p.invincible=3;
+          p.invincible=1.5;
         }
       }
       if(o._hitTimer){o._hitTimer-=dt;if(o._hitTimer<=0)o._hitTimer=0}
@@ -109,17 +109,24 @@ function update(dt){
     if(dist(p,o)<30){
       o.collected=true;state.player.score+=10;
       spawnPickup(rand(80,W-80),rand(120,H-120));
-      if(state.player.score%100===0)spawnEnemy(rand(80,W-80),rand(120,H-120));
+      if(state.player.score%100===0){
+        spawnEnemy(rand(80,W-80),rand(120,H-120));
+        state.player.invincible+=1.5;
+      }
     }
 
-  state.objects=state.objects.filter(o=>{if(o.type==='enemy')return o.hp>0;if(o.type==='pickup')return!o.collected;return true});
+  state.objects=state.objects.filter(o=>{
+    if(o.type==='enemy')return o.hp>0;
+    if(o.type==='pickup')return!o.collected;
+    return true;
+  });
   if(p.hp<=0){p.alive=false;p.hp=0;state.paused=true}
 }
 function render(){
   ctx.clearRect(0,0,W,H);
-  ctx.save();ctx.fillStyle='#111';ctx.fillRect(0,0,W,H);ctx.restore();
+  ctx.save();ctx.fillStyle='#e6e6e6';ctx.fillRect(0,0,W,H);ctx.restore();
   if(!state.started){
-    ctx.fillStyle='#fff';ctx.font='24px system-ui';ctx.textAlign='center';
+    ctx.fillStyle='#000';ctx.font='24px system-ui';ctx.textAlign='center';
     ctx.fillText('Press Any Key to Start',W/2,H/2);
     ctx.textAlign='left';return;
   }
@@ -130,32 +137,32 @@ function render(){
   for(const obj of drawables){
     if(obj.type==='pickup'){
       ctx.save();const s=1+(obj.y-H*0.4)/(H*0.6)*0.6;ctx.translate(obj.x,obj.y);ctx.scale(s,s);
-      ctx.beginPath();ctx.fillStyle='#999';ctx.arc(0,0,10,0,Math.PI*2);ctx.fill();ctx.restore();
+      ctx.beginPath();ctx.fillStyle='#ffd700';ctx.arc(0,0,10,0,Math.PI*2);ctx.fill();ctx.restore();
     }else if(obj.type==='enemy'){
       const pLike={x:obj.x,y:obj.y};const scale=0.8+(obj.y-H*0.4)/(H*0.6)*0.9;
       ctx.save();ctx.translate(pLike.x,pLike.y);
-      ctx.beginPath();ctx.fillStyle='rgba(0,0,0,0.45)';ctx.ellipse(0,18*scale,22*scale,8*scale,0,0,Math.PI*2);ctx.fill();
-      ctx.beginPath();ctx.fillStyle='#666';ctx.arc(0,-6*scale,16*scale,0,Math.PI*2);ctx.fill();
-      ctx.beginPath();ctx.fillStyle='#666';ctx.arc(0,-6*scale,8*scale,0,Math.PI*2);ctx.fill();
-      ctx.fillStyle='#666';ctx.fillRect(-10*scale,6*scale,20*scale,12*scale);ctx.restore();
+      ctx.beginPath();ctx.fillStyle='rgba(0,0,0,0.1)';ctx.ellipse(0,18*scale,22*scale,8*scale,0,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.fillStyle='#cc6666';ctx.arc(0,-6*scale,16*scale,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.fillStyle='#cc6666';ctx.arc(0,-6*scale,8*scale,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#cc6666';ctx.fillRect(-10*scale,6*scale,20*scale,12*scale);ctx.restore();
     }else if(obj.type==='player'){
       const p=state.player;const scale=0.8+(p.y-H*0.4)/(H*0.6)*0.9;
       ctx.save();ctx.translate(p.x,p.y);
       let visible=true;
       if(p.invincible>0)visible=Math.floor(Date.now()/100)%2===0;
       if(visible){
-        ctx.beginPath();ctx.fillStyle='rgba(0,0,0,0.45)';ctx.ellipse(0,18*scale,22*scale,8*scale,0,0,Math.PI*2);ctx.fill();
-        ctx.beginPath();ctx.fillStyle='#eee';ctx.arc(0,-6*scale,16*scale,0,Math.PI*2);ctx.fill();
-        ctx.beginPath();ctx.fillStyle='#eee';ctx.arc(0,-6*scale,8*scale,0,Math.PI*2);ctx.fill();
-        ctx.fillStyle='#eee';ctx.fillRect(-10*scale,6*scale,20*scale,12*scale);
+        ctx.beginPath();ctx.fillStyle='rgba(0,0,0,0.1)';ctx.ellipse(0,18*scale,22*scale,8*scale,0,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.fillStyle='#66aaff';ctx.arc(0,-6*scale,16*scale,0,Math.PI*2);ctx.fill();
+        ctx.beginPath();ctx.fillStyle='#66aaff';ctx.arc(0,-6*scale,8*scale,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#66aaff';ctx.fillRect(-10*scale,6*scale,20*scale,12*scale);
       }
       ctx.restore();
     }
   }
-  ctx.save();ctx.fillStyle='#fff';ctx.font='14px system-ui';ctx.textAlign='right';
+  ctx.save();ctx.fillStyle='#000';ctx.font='14px system-ui';ctx.textAlign='right';
   ctx.fillText(`HP: ${state.player.hp}`,W-24,34);ctx.fillText(`Score: ${state.player.score}`,W-24,56);
   ctx.restore();
-  if(state.paused){ctx.fillStyle='#fff';ctx.font='22px system-ui';ctx.textAlign='center';ctx.fillText('GAME OVER',W/2,H/2-5);ctx.font='14px system-ui';ctx.fillText('Press R to Restart',W/2,H/2+20);ctx.textAlign='left'}
+  if(state.paused){ctx.fillStyle='#000';ctx.font='22px system-ui';ctx.textAlign='center';ctx.fillText('GAME OVER',W/2,H/2-5);ctx.font='14px system-ui';ctx.fillText('Press R to Restart',W/2,H/2+20);ctx.textAlign='left'}
 }
 function loop(timestamp){const dt=(timestamp-state.lastTime)/1000||0.016;state.lastTime=timestamp;update(dt);render();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
