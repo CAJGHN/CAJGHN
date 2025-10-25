@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>CAJGHN Arade</title>
+  <title>CAJGHN Arcade</title>
   <style>
     html,body{height:100%;margin:0;background:#f2f2f2;color:#000;font-family:Inter,system-ui,Arial}
     .wrap{display:flex;flex-direction:column;height:100vh}
@@ -14,7 +14,7 @@
     header .btn:active{transform:translateY(1px)}
     #game-container{flex:1;display:flex;align-items:center;justify-content:center;position:relative}
     canvas{background:#e6e6e6;width:100%;max-width:1100px;height:calc(100vh - 70px);box-shadow:0 10px 30px rgba(0,0,0,0.1);border-radius:8px}
-    .hud{position:absolute;right:16px;top:16px;color:#333;font-size:14px}
+    .hud{position:absolute;right:16px;top:16px;color:#333;font-size:14px;text-align:right}
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;z-index:60}
     .modal{background:#fff;border-radius:10px;padding:20px;max-width:740px;width:90%;box-shadow:0 20px 50px rgba(0,0,0,0.2);font-size:15px;color:#111}
     .modal h2{margin:0 0 8px 0;font-size:18px}
@@ -25,7 +25,7 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>CAJGHN Arade</h1>
+      <h1>CAJGHN Arcade</h1>
       <div class="spacer"></div>
       <button class="btn" id="rulesBtn">Rules</button>
     </header>
@@ -40,6 +40,8 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
       <h2 id="rulesTitle">Game Rules</h2>
       <p>Controls: Move with WASD or arrow keys. Press R to restart the game.</p>
+      <p>Pause: Press Spacebar to pause/resume the game. The game will also pause automatically when the Rules window is open.</p>
+      <p>Toggle Guide: Press K to show/hide control guide.</p>
       <p>Coins: Collect coins to increase your score. Each coin gives +10 points.</p>
       <p>Enemies: Colliding with enemies reduces your HP by 1.</p>
       <p>Scaling difficulty: Every time your score reaches a multiple of 100 points, one additional enemy is spawned.</p>
@@ -73,7 +75,8 @@ const state={
   objects:[],
   lastTime:0,
   paused:false,
-  started:false
+  started:false,
+  showKeys:true
 };
 function rand(a,b){return Math.random()*(b-a)+a}
 function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
@@ -81,6 +84,8 @@ window.addEventListener('keydown',e=>{
   if(!state.started){state.started=true;return;}
   state.keys[e.key.toLowerCase()]=true;
   if(e.key==='r'||e.key==='R') restart();
+  if(e.code==='Space') togglePause();
+  if(e.key==='k'||e.key==='K') state.showKeys=!state.showKeys;
   if(e.key==='Escape') hideRules();
 });
 window.addEventListener('keyup',e=>{state.keys[e.key.toLowerCase()]=false;});
@@ -96,6 +101,10 @@ function initMap(){
 }
 initMap();
 function restart(){initMap();}
+function togglePause(){
+  if(!state.started||!state.player.alive)return;
+  state.paused=!state.paused;
+}
 function update(dt){
   if(!state.started||state.paused)return;
   const p=state.player;
@@ -110,9 +119,7 @@ function update(dt){
   p.x+=p.vx*dt;p.y+=p.vy*dt;
   p.x=Math.max(40,Math.min(W-40,p.x));
   p.y=Math.max(80,Math.min(H-40,p.y));
-
   if(p.invincible>0)p.invincible-=dt;
-
   for(const o of state.objects){
     if(o.type==='enemy'){
       o.x+=o.dir*o.speed*dt;o.y+=o.vyDir*o.vySpeed*dt;
@@ -128,7 +135,6 @@ function update(dt){
       if(o._hitTimer){o._hitTimer-=dt;if(o._hitTimer<=0)o._hitTimer=0}
     }
   }
-
   for(const o of state.objects)if(o.type==='pickup'&&!o.collected)
     if(dist(p,o)<30){
       o.collected=true;state.player.score+=10;
@@ -138,7 +144,6 @@ function update(dt){
         state.player.invincible+=1.5;
       }
     }
-
   state.objects=state.objects.filter(o=>{
     if(o.type==='enemy')return o.hp>0;
     if(o.type==='pickup')return!o.collected;
@@ -184,33 +189,33 @@ function render(){
     }
   }
   ctx.save();ctx.fillStyle='#000';ctx.font='14px system-ui';ctx.textAlign='right';
-  ctx.fillText(`HP: ${state.player.hp}`,W-24,34);ctx.fillText(`Score: ${state.player.score}`,W-24,56);
+  ctx.fillText(`HP: ${state.player.hp}`,W-24,34);
+  ctx.fillText(`Score: ${state.player.score}`,W-24,56);
+  if(state.showKeys){
+    ctx.textAlign='center';
+    ctx.font='13px system-ui';
+    ctx.fillText('Move: WASD / Arrows | Pause: Space | Restart: R | Toggle Guide: K',W/2,H-20);
+    ctx.textAlign='right';
+  }
   ctx.restore();
-  if(state.paused){ctx.fillStyle='#000';ctx.font='22px system-ui';ctx.textAlign='center';ctx.fillText('GAME OVER',W/2,H/2-5);ctx.font='14px system-ui';ctx.fillText('Press R to Restart',W/2,H/2+20);ctx.textAlign='left'}
+  if(state.paused&&!state.player.alive){ctx.fillStyle='#000';ctx.font='22px system-ui';ctx.textAlign='center';ctx.fillText('GAME OVER',W/2,H/2-5);ctx.font='14px system-ui';ctx.fillText('Press R to Restart',W/2,H/2+20);ctx.textAlign='left'}
+  else if(state.paused&&state.player.alive){ctx.fillStyle='#000';ctx.font='20px system-ui';ctx.textAlign='center';ctx.fillText('PAUSED',W/2,H/2);ctx.textAlign='left'}
 }
 function loop(timestamp){const dt=(timestamp-state.lastTime)/1000||0.016;state.lastTime=timestamp;update(dt);render();requestAnimationFrame(loop)}
 requestAnimationFrame(loop);
-
 const hud=document.getElementById('hud');hud.innerHTML='';
-
 const rulesBtn=document.getElementById('rulesBtn');
 const modalOverlay=document.getElementById('modalOverlay');
 const closeRules=document.getElementById('closeRules');
-
 function showRules(){
+  if(!state.paused)state.paused=true;
   modalOverlay.style.display='flex';
   modalOverlay.setAttribute('aria-hidden','false');
 }
-function hideRules(){
-  modalOverlay.style.display='none';
-  modalOverlay.setAttribute('aria-hidden','true');
-}
-
+function hideRules(){modalOverlay.style.display='none';modalOverlay.setAttribute('aria-hidden','true');}
 rulesBtn.addEventListener('click',showRules);
 closeRules.addEventListener('click',hideRules);
-modalOverlay.addEventListener('click',e=>{
-  if(e.target===modalOverlay)hideRules();
-});
+modalOverlay.addEventListener('click',e=>{if(e.target===modalOverlay)hideRules();});
 </script>
 </body>
 </html>
