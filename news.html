@@ -5,38 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CAJGHN News</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5294434283162960" crossorigin="anonymous"></script>
   <style>
-    .menu-enter {
-      transform: scaleY(0);
-      opacity: 0;
-      transform-origin: top;
-      transition: all 0.3s ease-in-out;
-    }
-    .menu-enter-active {
-      transform: scaleY(1);
-      opacity: 1;
-    }
-    .link-click {
-      transform: none;
-      transition: none;
-    }
-    .hover-white:hover {
-      color: #ffffff;
-    }
-    .footer-icon {
-      width: 48px;
-      height: 48px;
-    }
+    .menu-enter {transform: scaleY(0);opacity: 0;transform-origin: top;transition: all 0.3s ease-in-out;}
+    .menu-enter-active {transform: scaleY(1);opacity: 1;}
+    .link-click {transform: none;transition: none;}
+    .hover-white:hover {color: #ffffff;}
+    .footer-icon {width: 48px;height: 48px;}
   </style>
 </head>
 <body class="bg-gray-300">
-
   <nav class="bg-gray-400 shadow-md fixed w-full z-10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-20">
-        <a href="https://cajghn.com" class="text-3xl font-bold text-black hover-white transition-colors">
-          CAJGHN
-        </a>
+        <a href="https://cajghn.com" class="text-3xl font-bold text-black hover-white transition-colors">CAJGHN</a>
         <div class="hidden md:flex space-x-6">
           <a href="https://cajghn.com/studio" target="_blank" class="text-black font-semibold hover-white transition-colors">Studio</a>
           <a href="https://cajghn.com/crypto" target="_blank" class="text-black font-semibold hover-white transition-colors">Crypto</a>
@@ -47,8 +29,7 @@
         <div class="md:hidden">
           <button id="menu-btn" class="focus:outline-none">
             <svg class="w-8 h-8 text-black hover-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                    d="M4 6h16M4 12h16M4 18h16"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
           </button>
         </div>
@@ -64,36 +45,18 @@
   </nav>
 
   <main class="h-screen flex flex-col justify-center items-center bg-gray-300 text-center px-4">
-    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-6">
-      EOI AI – Equality of Information
-    </h1>
-    <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-black max-w-3xl mb-6">
-      Get the latest news delivered fairly and fast.<br>
-      Stay updated with EOI AI.
-    </p>
-    <a href="https://t.me/EOIAI" target="_blank" 
-       class="bg-[#0088cc] hover:bg-[#0077b3] text-white font-semibold px-6 py-3 rounded-2xl shadow-md transition-colors">
-      Get News on Telegram
-    </a>
+    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-black mb-6">EOI AI – Equality of Information</h1>
+    <p class="text-base sm:text-lg md:text-xl lg:text-2xl text-black max-w-3xl mb-6">Get the latest news delivered fairly and fast.<br>Stay updated with EOI AI.</p>
+    <a href="https://t.me/EOIAI" target="_blank" class="bg-[#0088cc] hover:bg-[#0077b3] text-white font-semibold px-6 py-3 rounded-2xl shadow-md transition-colors">Get News on Telegram</a>
   </main>
 
   <footer class="bg-gray-400 text-center py-6 shadow-inner">
     <div class="flex justify-center space-x-4 mt-4">
-      <a href="https://www.youtube.com/@CAJGHN" target="_blank">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube" class="footer-icon">
-      </a>
-      <a href="https://www.instagram.com/cajghn/" target="_blank">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="footer-icon">
-      </a>
-      <a href="https://t.me/cajghn" target="_blank">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="footer-icon">
-      </a>
+      <a href="https://www.youtube.com/@CAJGHN" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube" class="footer-icon"></a>
+      <a href="https://www.instagram.com/cajghn/" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="footer-icon"></a>
+      <a href="https://t.me/cajghn" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram" class="footer-icon"></a>
     </div>
-
-    <p class="text-black text-sm mt-4">
-      Business inquiries: 
-      <a href="mailto:cajghn@gmail.com" class="hover-white underline transition-colors">cajghn@gmail.com</a>
-    </p>
+    <p class="text-black text-sm mt-4">Business inquiries: <a href="mailto:cajghn@gmail.com" class="hover-white underline transition-colors">cajghn@gmail.com</a></p>
     <p class="text-black text-sm mt-2">Copyright © 2025 CAJGHN. All Rights Reserved.</p>
   </footer>
 
@@ -101,7 +64,6 @@
     const menuBtn = document.getElementById("menu-btn");
     const menu = document.getElementById("menu");
     const mobileLinks = document.querySelectorAll(".mobile-link");
-
     menuBtn.addEventListener("click", () => {
       if (menu.classList.contains("hidden")) {
         menu.classList.remove("hidden");
@@ -111,7 +73,6 @@
         setTimeout(() => menu.classList.add("hidden"), 300);
       }
     });
-
     mobileLinks.forEach(link => {
       link.addEventListener("click", (e) => {
         e.target.classList.add("link-click");
