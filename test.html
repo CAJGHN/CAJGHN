@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CAJGHN 3D 모델 뷰어</title>
+  <title>STL 3D 뷰어</title>
   <style>
     body { margin: 0; overflow: hidden; background-color: #f0f0f0; }
     #info {
@@ -25,28 +25,26 @@
 
   <script type="module">
     import * as THREE from './three.module.js';
-    import { GLTFLoader } from './GLTFLoader.js';
+    import { STLLoader } from './STLLoader.js';
     import { OrbitControls } from './OrbitControls.js';
 
-    // 씬, 카메라, 렌더러
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf0f0f0);
 
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 1.5, 3);
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 0, 5);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
     document.body.appendChild(renderer.domElement);
 
-    // OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.screenSpacePanning = false;
     controls.minDistance = 0.5;
-    controls.maxDistance = 10;
+    controls.maxDistance = 50;
 
     // 조명
     const dirLight = new THREE.DirectionalLight(0xffffff, 1);
@@ -56,39 +54,34 @@
     const ambLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambLight);
 
-    // GLB 모델 로드
-    const loader = new GLTFLoader();
-    loader.load('CAJGHN_lego_head.glb', (gltf) => {
-      const model = gltf.scene;
-      scene.add(model);
+    // STL 로드
+    const loader = new STLLoader();
+    loader.load('CAJGHN_lego_head.stl', (geometry) => {
+      const material = new THREE.MeshStandardMaterial({ color: 0x156289, metalness: 0.5, roughness: 0.5 });
+      const mesh = new THREE.Mesh(geometry, material);
 
-      // 모델 중심과 카메라 위치 조정
-      const box = new THREE.Box3().setFromObject(model);
-      const size = box.getSize(new THREE.Vector3()).length();
-      const center = box.getCenter(new THREE.Vector3());
-      controls.target.copy(center);
+      // 모델 중심 맞추기
+      geometry.computeBoundingBox();
+      const center = new THREE.Vector3();
+      geometry.boundingBox.getCenter(center);
+      mesh.position.sub(center);
 
-      camera.near = size / 100;
-      camera.far = size * 100;
-      camera.updateProjectionMatrix();
+      scene.add(mesh);
 
-      camera.position.copy(center);
-      camera.position.x += size / 2.0;
-      camera.position.y += size / 5.0;
-      camera.position.z += size / 2.0;
+      // 카메라 위치 조정
+      const size = geometry.boundingBox.getSize(new THREE.Vector3()).length();
+      camera.position.set(size, size, size);
       controls.update();
     }, undefined, (error) => {
       console.error(error);
     });
 
-    // 브라우저 리사이즈 대응
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // 렌더링 루프
     function animate() {
       requestAnimationFrame(animate);
       controls.update();
