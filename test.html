@@ -6,7 +6,6 @@
   <title>CAJGHN 3D 모델 뷰어</title>
   <style>
     body { margin: 0; overflow: hidden; background-color: #f0f0f0; }
-    #viewer { width: 100vw; height: 100vh; display: block; }
     #info {
       position: absolute;
       top: 10px;
@@ -17,20 +16,18 @@
       border-radius: 8px;
       font-family: sans-serif;
       font-size: 14px;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
   <div id="info">마우스로 회전/확대/이동 가능합니다.</div>
-  <canvas id="viewer"></canvas>
 
-  <!-- Three.js -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/loaders/GLTFLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/controls/OrbitControls.js"></script>
-
-  <script>
-    const canvas = document.getElementById('viewer');
+  <!-- 모듈 방식으로 Three.js, GLTFLoader, OrbitControls 임포트 -->
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js';
+    import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/loaders/GLTFLoader.js';
+    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/controls/OrbitControls.js';
 
     // 씬
     const scene = new THREE.Scene();
@@ -41,13 +38,14 @@
     camera.position.set(0, 1.5, 3);
 
     // 렌더러
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
+    document.body.appendChild(renderer.domElement);
 
     // 컨트롤
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;  // 부드러운 이동
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.screenSpacePanning = false;
     controls.minDistance = 0.5;
@@ -62,12 +60,11 @@
     scene.add(ambLight);
 
     // GLB 로드
-    const loader = new THREE.GLTFLoader();
+    const loader = new GLTFLoader();
     loader.load('CAJGHN_lego_head.glb', function(gltf){
       const model = gltf.scene;
       scene.add(model);
 
-      // 모델 중심에 카메라가 잘 보이도록 조정
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3()).length();
       const center = box.getCenter(new THREE.Vector3());
