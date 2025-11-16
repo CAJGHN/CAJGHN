@@ -23,12 +23,12 @@
 <body>
   <div id="info">마우스로 회전/확대/이동 가능합니다.</div>
 
-  <script type="module">
-    // CDN으로 Three.js 모듈 가져오기
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js';
-    import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/loaders/GLTFLoader.js';
-    import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/controls/OrbitControls.js';
+  <!-- Three.js 및 플러그인 -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/controls/OrbitControls.js"></script>
 
+  <script>
     // 씬, 카메라, 렌더러
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf0f0f0);
@@ -42,7 +42,7 @@
     document.body.appendChild(renderer.domElement);
 
     // OrbitControls
-    const controls = new OrbitControls(camera, renderer.domElement);
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.screenSpacePanning = false;
@@ -58,8 +58,8 @@
     scene.add(ambLight);
 
     // GLB 모델 로드
-    const loader = new GLTFLoader();
-    loader.load('CAJGHN_lego_head.glb', (gltf) => {
+    const loader = new THREE.GLTFLoader();
+    loader.load('CAJGHN_lego_head.glb', function(gltf){
       const model = gltf.scene;
       scene.add(model);
 
@@ -77,7 +77,7 @@
       camera.position.y += size / 5.0;
       camera.position.z += size / 2.0;
       controls.update();
-    }, undefined, (error) => {
+    }, undefined, function(error){
       console.error(error);
     });
 
