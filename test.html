@@ -1,227 +1,104 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>이더리움 구매</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-html, body { height:100%; margin:0; padding:0; background:#0d0d0d; color:#d1d5db; font-family:'Inter', sans-serif; }
-body { display:flex; flex-direction:column; }
-
-.top-bar {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  width:100%;
-  max-width:1200px;
-  margin:0 auto;
-  padding:1rem;
-  box-sizing:border-box;
-}
-
-.clock { font-weight:bold; font-size:clamp(1rem,3vw,1.5rem); color:#d1d5db; }
-
-.top-buttons {
-  display:flex;
-  gap:0.5rem;
-}
-.top-buttons button {
-  background:#1f1f1f;
-  color:#f5f5f5;
-  padding:0.5rem 1rem;
-  border-radius:0.5rem;
-  border:none;
-  cursor:pointer;
-  font-weight:bold;
-  transition: all 0.3s;
-}
-.top-buttons button:hover { background:#2c2c2c; }
-
-.container { display:flex; flex-direction:column; align-items:center; width:100%; max-width:1200px; padding:1rem; box-sizing:border-box; text-align:left; flex:1; }
-
-.wallet-balance { margin:0.5rem 0 1rem 0; font-size:clamp(1rem,3vw,1.5rem); display:flex; align-items:center; gap:0.5rem; color:#f5f5f5; }
-
-button.refresh-btn {
-  background:#1f1f1f;
-  border:none;
-  padding:0.5rem;
-  border-radius:9999px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  transition: all 0.3s;
-}
-button.refresh-btn:hover { background:#2c2c2c; }
-button.refresh-btn svg { width:1.2rem; height:1.2rem; color:#f5f5f5; transition: transform 0.5s; }
-
-.spin-reverse { animation:spin-reverse 0.8s linear; }
-@keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
-
-.purchase-card {
-  background: linear-gradient(145deg, #1b1b1b, #2b2b2b);
-  border-radius:1rem;
-  padding:1.5rem;
-  margin-bottom:1rem;
-  width:100%;
-  max-width:600px;
-  box-shadow:0 6px 15px rgba(0,0,0,0.7);
-}
-.purchase-card input { width:100%; padding:0.5rem; border-radius:0.5rem; border:none; margin-bottom:0.5rem; background:#f5f5f5; color:#000; }
-
-.button-group { display:flex; gap:0.5rem; margin-bottom:0.5rem; }
-button.copy-btn, button.telegram-btn {
-  background:#1f1f1f;
-  border:none;
-  padding:0.5rem 1rem;
-  border-radius:0.5rem;
-  cursor:pointer;
-  color:#f5f5f5;
-  font-weight:bold;
-  transition:0.3s;
-}
-button.copy-btn:hover, button.telegram-btn:hover { background:#2c2c2c; }
-
-.notice-card {
-  background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
-  border-radius:1rem;
-  padding:1.5rem;
-  margin-bottom:1rem;
-  width:100%;
-  max-width:600px;
-  box-shadow:0 6px 15px rgba(0,0,0,0.7);
-}
-
-footer { text-align:center; font-size:clamp(0.9rem,2.5vw,1.2rem); padding:1rem; color:#9ca3af; }
-
-@media (max-width:1024px){
-  .top-bar { flex-direction:column; gap:0.5rem; }
-  .top-buttons { justify-content:center; flex-wrap:wrap; }
-  .button-group { justify-content:center; flex-wrap:wrap; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAJGHN 3D 모델 뷰어</title>
+  <style>
+    body { margin: 0; overflow: hidden; background-color: #f0f0f0; }
+    #viewer { width: 100vw; height: 100vh; display: block; }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-family: sans-serif;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-<div class="top-bar">
-  <div class="clock" id="clock"></div>
-  <div class="top-buttons">
-    <button onclick="window.location.href='https://t.me/cajghn'">인증</button>
-    <button onclick="window.location.href='https://t.me/cajghn'">이더리움 구매</button>
-    <button onclick="window.location.href='https://t.me/cajghn'">NFT 구매</button>
-  </div>
-</div>
+  <div id="info">마우스로 회전/확대/이동 가능합니다.</div>
+  <canvas id="viewer"></canvas>
 
-<div class="container">
-  <div class="wallet-balance">
-    <span id="ethBalance">구매 가능 수량: Loading...</span>
-    <button class="refresh-btn" id="refreshBalance">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582M20 20v-5h-.581M4.582 9a8 8 0 0114.836 0M19.418 15a8 8 0 01-14.836 0"/>
-      </svg>
-    </button>
-  </div>
+  <!-- Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/controls/OrbitControls.js"></script>
 
-  <div class="purchase-card">
-    <h2>이더리움 구매 양식</h2>
-    <div class="button-group">
-      <button id="copyBtn" class="copy-btn">양식 복사</button>
-      <button onclick="window.open('https://t.me/cajghn','_blank')" class="telegram-btn">텔레그램</button>
-    </div>
-    <input type="number" id="ethInput" placeholder="구매할 ETH 수량">
-    <input type="text" id="accountInput" placeholder="입금자 계좌번호">
-    <input type="text" id="nameInput" placeholder="입금자 이름">
-    <input type="text" id="walletInput" placeholder="지갑 주소">
-    <div>입금할 금액: <span id="calcResult">0 원</span></div>
-  </div>
+  <script>
+    const canvas = document.getElementById('viewer');
 
-  <div class="notice-card">
-    <h2>주의사항</h2>
-    <p>위 양식을 복사하여 텔레그램으로 보내주세요.</p>
-    <ul>
-      <li>· 전송 가스비는 별도입니다.</li>
-      <li>· 수수료 3%가 적용됩니다.</li>
-      <li>· 입금자 이름과 계좌 이름이 동일해야 합니다.</li>
-      <li>· 송금 계좌는 카카오뱅크 미니만 허용됩니다.</li>
-      <li>· 환불은 불가합니다.</li>
-      <li>· 잘못된 지갑 주소 입력 등으로 인한 손실은 이용자 책임입니다.</li>
-    </ul>
-  </div>
-</div>
+    // 씬
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xf0f0f0);
 
-<footer>
-  Copyright © 2025 코인 거래소. All Rights Reserved.
-</footer>
+    // 카메라
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 1.5, 3);
 
-<script>
-function updateClock(){
-  const now = new Date();
-  const hours = now.getHours()%12 || 12;
-  const minutes = now.getMinutes().toString().padStart(2,'0');
-  const seconds = now.getSeconds().toString().padStart(2,'0');
-  const period = now.getHours()>=12?'오후':'오전';
-  const year = now.getFullYear();
-  const month = (now.getMonth()+1).toString().padStart(2,'0');
-  const day = now.getDate().toString().padStart(2,'0');
-  document.getElementById('clock').textContent=`${period} ${hours}:${minutes}:${seconds} ${year}-${month}-${day}`;
-}
-setInterval(updateClock,1000);
-updateClock();
+    // 렌더러
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
 
-const walletAddr = '0x9499dB4bC22482649d666ca31EE1C10d4712CC57';
-const apiKey = '1SY82M313ZV25EBJZJRUZ9PJW1QMCHZM1I';
+    // 컨트롤
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;  // 부드러운 이동
+    controls.dampingFactor = 0.05;
+    controls.screenSpacePanning = false;
+    controls.minDistance = 0.5;
+    controls.maxDistance = 10;
 
-async function fetchWalletBalance(){
-  try{
-    const res = await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=account&action=balance&address=${walletAddr}&apikey=${apiKey}`);
-    const data = await res.json();
-    const wei = data.result;
-    const eth = parseFloat(wei / 1e18);
-    document.getElementById('ethBalance').textContent = `구매 가능 수량: ${eth.toFixed(8)} ETH`;
-  }catch(e){
-    document.getElementById('ethBalance').textContent = '구매 가능 수량: Error';
-  }
-}
-fetchWalletBalance();
-setInterval(fetchWalletBalance, 300000);
+    // 조명
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.position.set(5, 10, 7.5);
+    scene.add(dirLight);
 
-const refreshBtn = document.getElementById('refreshBalance');
-refreshBtn.addEventListener('click', () => {
-  fetchWalletBalance();
-  const svg = refreshBtn.querySelector('svg');
-  svg.classList.add('spin-reverse');
-  svg.addEventListener('animationend', () => svg.classList.remove('spin-reverse'), {once:true});
-});
+    const ambLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambLight);
 
-const ethInput = document.getElementById("ethInput");
-const accountInput = document.getElementById("accountInput");
-const nameInput = document.getElementById("nameInput");
-const walletInput = document.getElementById("walletInput");
-const calcResult = document.getElementById("calcResult");
-const pricePerEth = 9379310;
-const feeRate = 0.03;
-const minPurchase = 100;
+    // GLB 로드
+    const loader = new THREE.GLTFLoader();
+    loader.load('CAJGHN_lego_head.glb', function(gltf){
+      const model = gltf.scene;
+      scene.add(model);
 
-ethInput.addEventListener("input", () => { 
-  const value = parseFloat(ethInput.value);
-  if(isNaN(value) || value <= 0){calcResult.textContent="0 원"; return;}
-  const base = value * pricePerEth;
-  const fee = base * feeRate;
-  const total = Math.floor(base + fee);
-  if(total < minPurchase){calcResult.textContent="최소 구매 금액은 100원입니다."; return;}
-  calcResult.textContent=total.toLocaleString()+" 원 (수수료 포함)";
-});
+      // 모델 중심에 카메라가 잘 보이도록 조정
+      const box = new THREE.Box3().setFromObject(model);
+      const size = box.getSize(new THREE.Vector3()).length();
+      const center = box.getCenter(new THREE.Vector3());
+      controls.target.copy(center);
 
-const copyBtn = document.getElementById("copyBtn");
-copyBtn.addEventListener("click", () => {
-  const ethAmount = ethInput.value || 0;
-  const account = accountInput.value || "";
-  const name = nameInput.value || "";
-  const walletAddr = walletInput.value || "";
-  const totalText = calcResult.textContent;
-  const textToCopy = `ETH 구매 요청\nETH 수량: ${ethAmount}\n계좌번호: ${account}\n입금자 이름: ${name}\n지갑 주소: ${walletAddr}\n입금할 금액: ${totalText}`;
-  navigator.clipboard.writeText(textToCopy);
-});
-</script>
+      camera.near = size / 100;
+      camera.far = size * 100;
+      camera.updateProjectionMatrix();
+      camera.position.copy(center);
+      camera.position.x += size / 2.0;
+      camera.position.y += size / 5.0;
+      camera.position.z += size / 2.0;
+      controls.update();
+    }, undefined, function(error){
+      console.error(error);
+    });
+
+    // 리사이즈 대응
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // 애니메이션 루프
+    function animate(){
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
 </body>
 </html>
