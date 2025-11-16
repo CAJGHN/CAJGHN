@@ -23,12 +23,11 @@
 <body>
   <div id="info">마우스로 회전/확대/이동 가능합니다.</div>
 
-  <!-- Three.js 및 플러그인 -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/loaders/GLTFLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/js/controls/OrbitControls.js"></script>
+  <script type="module">
+    import * as THREE from './three.module.js';
+    import { GLTFLoader } from './GLTFLoader.js';
+    import { OrbitControls } from './OrbitControls.js';
 
-  <script>
     // 씬, 카메라, 렌더러
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf0f0f0);
@@ -42,7 +41,7 @@
     document.body.appendChild(renderer.domElement);
 
     // OrbitControls
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.screenSpacePanning = false;
@@ -58,8 +57,8 @@
     scene.add(ambLight);
 
     // GLB 모델 로드
-    const loader = new THREE.GLTFLoader();
-    loader.load('CAJGHN_lego_head.glb', function(gltf){
+    const loader = new GLTFLoader();
+    loader.load('CAJGHN_lego_head.glb', (gltf) => {
       const model = gltf.scene;
       scene.add(model);
 
@@ -72,16 +71,17 @@
       camera.near = size / 100;
       camera.far = size * 100;
       camera.updateProjectionMatrix();
+
       camera.position.copy(center);
       camera.position.x += size / 2.0;
       camera.position.y += size / 5.0;
       camera.position.z += size / 2.0;
       controls.update();
-    }, undefined, function(error){
+    }, undefined, (error) => {
       console.error(error);
     });
 
-    // 리사이즈 대응
+    // 브라우저 리사이즈 대응
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
