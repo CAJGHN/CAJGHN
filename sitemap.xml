@@ -3,7 +3,7 @@
 
   <url>
     <loc>https://cajghn.com/</loc>
-    <lastmod>2025-09-29</lastmod>
+    <lastmod>2025-11-22</lastmod>
     <priority>1.0</priority>
   </url>
 
@@ -26,8 +26,8 @@
   </url>
 
   <url>
-    <loc>https://cajghn.com/news</loc>
-    <lastmod>2025-09-29</lastmod>
+    <loc>https://cajghn.com/memo</loc>
+    <lastmod>2025-11-21</lastmod>
     <priority>0.8</priority>
   </url>
 
@@ -38,3 +38,4 @@
   </url>
 
 </urlset>
+
