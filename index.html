@@ -1,217 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CAJGHN</title>
-  <style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAJGHN</title>
+<style>
     body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #fff;
-      color: #000;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: #ffffff;
+        color: #000000;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
     }
 
     header {
-      width: 100%;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      box-sizing: border-box;
+        width: 100%;
+        padding: 20px 30px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
     .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      letter-spacing: 2px;
-      text-align: center;
-      width: 100%;
-      margin-bottom: 0.5rem;
-      color: #000;
-      text-decoration: none;
-      cursor: pointer;
+        font-size: 24px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        cursor: pointer;
+        text-decoration: none;
+        color: #000;
     }
 
     nav {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: nowrap;
+        display: flex;
+        gap: 18px;
     }
 
     nav a {
-      text-decoration: none;
-      color: #000;
-      font-size: 1rem;
-      padding: 0.5rem 1rem;
-      border: 1px solid #000;
-      border-radius: 8px;
-      transition: 0.25s;
-      white-space: nowrap;
+        text-decoration: none;
+        color: #000;
+        font-size: 16px;
+        padding: 12px 20px;
+        border: 1px solid #000;
+        border-radius: 8px;
+        transition: 0.25s;
     }
 
     nav a:hover {
-      background: #000;
-      color: #fff;
+        background: #000;
+        color: #fff;
     }
 
     .hero {
-      padding: 5rem 2rem;
-      text-align: center;
-      max-width: 900px;
-      margin: 0 auto;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: 100vh;
+        padding: 200px 30px;
+        text-align: center;
+        max-width: 900px;
+        margin: 0 auto;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100vh;
+        box-sizing: border-box;
     }
 
     .hero h1 {
-      font-size: 3rem;
-      font-weight: 700;
-      margin-bottom: 1.5rem;
+        font-size: 64px;
+        font-weight: 700;
+        margin-bottom: 30px;
     }
 
     .hero p {
-      font-size: 1.2rem;
-      margin-bottom: 3rem;
-      color: #444;
-      line-height: 1.6;
+        font-size: 20px;
+        margin-bottom: 50px;
+        color: #444;
+        line-height: 1.6;
     }
 
     .footer-section {
-      width: 100%;
-      padding: 3rem 2rem;
-      background: #fff;
-      color: #000;
-      box-sizing: border-box;
+        width: 100%;
+        padding: 60px 30px;
+        background: #fff;
+        color: #000;
+        box-sizing: border-box;
     }
 
     .footer-container {
-      max-width: 1200px;
-      margin: 0 auto;
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
     .footer-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2rem;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 40px;
     }
 
     .footer-col {
-      display: flex;
-      flex-direction: column;
+        display: flex;
+        flex-direction: column;
     }
 
     .footer-heading {
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 14px;
+        font-size: 16px;
     }
 
     .footer-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
+        list-style: none;
+        padding: 0;
+        margin: 0;
     }
 
     .footer-list li {
-      margin-bottom: 0.5rem;
+        margin-bottom: 8px;
     }
 
     .footer-list a {
-      color: #000;
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: 0.25s;
+        color: #000;
+        font-size: 14px;
+        text-decoration: none;
+        transition: 0.25s;
     }
 
     .footer-list a:hover {
-      opacity: 0.6;
+        opacity: 0.6;
     }
 
     .footer-bottom {
-      margin-top: 2rem;
-      padding-top: 1rem;
-      text-align: center;
-      font-size: 0.9rem;
-      color: #000;
+        margin-top: 40px;
+        padding-top: 20px;
+        text-align: center;
+        font-size: 14px;
+        color: #000;
     }
 
-    @media(max-width: 1000px) {
-      .logo {
-        margin-bottom: 0.5rem;
-      }
+    @media (max-width: 700px) {
+        header {
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 16px 20px;
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+        }
+
+        nav a {
+            width: calc(100% - 40px);
+            max-width: 300px;
+            padding: 12px 0;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .hero {
+            padding: 150px 20px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+        }
+
+        .hero p {
+            font-size: 18px;
+        }
+
+        .footer-grid {
+            grid-template-columns: 1fr 1fr;
+        }
     }
 
-    @media(max-width: 800px) {
-      .footer-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    @media (max-width: 500px) {
+        .hero {
+            padding: 120px 15px;
+        }
+        .hero h1 {
+            font-size: 36px;
+        }
+        .hero p {
+            font-size: 16px;
+        }
     }
-  </style>
+</style>
 </head>
 <body>
-  <header>
+<header>
     <a class="logo" href="/">CAJGHN</a>
     <nav>
-      <a href="https://cajghn.com/studio" target="_blank" rel="noopener">Studio</a>
-      <a href="https://cajghn.com/crypto" target="_blank" rel="noopener">Crypto</a>
-      <a href="https://cajghn.com/lounge" target="_blank" rel="noopener">Lounge</a>
-      <a href="https://cajghn.com/arcade" target="_blank" rel="noopener">Arcade</a>
-      <a href="https://cajghn.com/memo" target="_blank" rel="noopener">Memo</a>
+        <a href="https://cajghn.com/studio" target="_blank" rel="noopener">Studio</a>
+        <a href="https://cajghn.com/crypto" target="_blank" rel="noopener">Crypto</a>
+        <a href="https://cajghn.com/lounge" target="_blank" rel="noopener">Lounge</a>
+        <a href="https://cajghn.com/arcade" target="_blank" rel="noopener">Arcade</a>
+        <a href="https://cajghn.com/memo" target="_blank" rel="noopener">Memo</a>
     </nav>
-  </header>
-
-  <section class="hero">
+</header>
+<section class="hero">
     <h1>Welcome to CAJGHN</h1>
-    <p>Explore a collection of minimal and sleek tools designed to enhance your experience. Navigate through Studio, Crypto, Lounge, Arcade, and Memo — each crafted with simplicity and clarity in mind. Enjoy a modern and clean environment built just for you.</p>
-  </section>
-
-  <footer class="footer-section">
+    <p>CAJGHN is your hub for minimal and modern web tools. Explore and use features across Studio, Crypto, Lounge, Arcade, and Memo. Dive in to experience smooth, intuitive, and efficient solutions designed to make your digital interactions clear, simple, and enjoyable.</p>
+</section>
+<footer class="footer-section">
     <div class="footer-container">
-      <div class="footer-grid">
-        <div class="footer-col">
-          <h3 class="footer-heading">Product</h3>
-          <ul class="footer-list">
-            <li><a href="https://example.com/features" target="_blank">Features</a></li>
-            <li><a href="https://example.com/docs" target="_blank">Documentation</a></li>
-            <li><a href="https://example.com/pricing" target="_blank">Pricing</a></li>
-          </ul>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3 class="footer-heading">Product</h3>
+                <ul class="footer-list">
+                    <li><a href="https://example.com/features" target="_blank">Features</a></li>
+                    <li><a href="https://example.com/docs" target="_blank">Documentation</a></li>
+                    <li><a href="https://example.com/pricing" target="_blank">Pricing</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3 class="footer-heading">Partners</h3>
+                <ul class="footer-list">
+                    <li><a href="https://www.ameowzon.com" target="_blank">Ameowzon</a></li>
+                    <li><a href="https://t.me/eoiai" target="_blank">EOI</a></li>
+                    <li><a href="https://example.com/pricing" target="_blank">Pricing</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3 class="footer-heading">Company</h3>
+                <ul class="footer-list">
+                    <li><a href="https://cajghn.com/about" target="_blank">About</a></li>
+                    <li><a href="https://cajghn.com/contact" target="_blank">Contact</a></li>
+                    <li><a href="https://t.me/cajghn" target="_blank">Telegram</a></li>                   
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3 class="footer-heading">Connect</h3>
+                <ul class="footer-list">
+                    <li><a href="https://github.com/CAJGHN" target="_blank">GitHub</a></li>
+                    <li><a href="https://www.youtube.com/@CAJGHN" target="_blank">YouTube</a></li>
+                    <li><a href="https://www.instagram.com/cajghn/" target="_blank">Instagram</a></li>
+                </ul>
+            </div>
         </div>
-        <div class="footer-col">
-          <h3 class="footer-heading">Partners</h3>
-          <ul class="footer-list">
-            <li><a href="https://www.ameowzon.com" target="_blank">Ameowzon</a></li>
-            <li><a href="https://t.me/eoiai" target="_blank">EOI</a></li>
-            <li><a href="https://example.com/pricing" target="_blank">Pricing</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h3 class="footer-heading">Company</h3>
-          <ul class="footer-list">
-            <li><a href="https://cajghn.com/about" target="_blank">About</a></li>
-            <li><a href="https://cajghn.com/contact" target="_blank">Contact</a></li>
-            <li><a href="https://t.me/cajghn" target="_blank">Telegram</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h3 class="footer-heading">Connect</h3>
-          <ul class="footer-list">
-            <li><a href="https://github.com/CAJGHN" target="_blank">GitHub</a></li>
-            <li><a href="https://www.youtube.com/@CAJGHN" target="_blank">YouTube</a></li>
-            <li><a href="https://www.instagram.com/cajghn/" target="_blank">Instagram</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">© 2025 CAJGHN. All Rights Reserved.</div>
+        <div class="footer-bottom">© 2025 CAJGHN. All Rights Reserved.</div>
     </div>
-  </footer>
+</footer>
 </body>
 </html>
