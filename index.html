@@ -112,6 +112,25 @@
         font-weight: 300;
     }
 
+    .cta-button {
+        display: inline-block;
+        padding: 14px 35px;
+        font-size: 18px;
+        font-weight: 600;
+        text-decoration: none;
+        background: var(--accent);
+        color: var(--bg);
+        border-radius: 8px;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+    }
+
+    .cta-button:hover {
+        background: var(--text);
+        transform: translateY(-2px);
+    }
+
     .section {
         padding: 140px 40px;
         max-width: 1400px;
@@ -230,69 +249,6 @@
         font-size: 14px;
         color: var(--subtext);
     }
-
-    @media (max-width: 1200px) {
-        .hero h1 {
-            font-size: 68px;
-        }
-        .section-header h2 {
-            font-size: 38px;
-        }
-    }
-
-    @media (max-width: 1000px) {
-        header {
-            padding: 18px 40px;
-        }
-        .cards {
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        .hero h1 {
-            font-size: 56px;
-        }
-        .footer-grid {
-            grid-template-columns: 1fr 1fr;
-        }
-    }
-
-    @media (max-width: 700px) {
-        header {
-            flex-direction: column;
-            gap: 20px;
-            padding: 15px 20px;
-        }
-        nav {
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-        }
-        .cards {
-            grid-template-columns: 1fr;
-        }
-        .hero {
-            padding: 120px 20px 100px;
-        }
-        .hero h1 {
-            font-size: 40px;
-        }
-        .hero p {
-            font-size: 18px;
-        }
-        .section {
-            padding: 80px 20px;
-        }
-        .section-header h2 {
-            font-size: 30px;
-        }
-        .footer-grid {
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
-        .footer-about {
-            order: 4;
-        }
-    }
 </style>
 </head>
 <body>
@@ -300,17 +256,16 @@
 <header>
     <a class="logo" href="/">CAJGHN</a>
     <nav>
-        <a href="https://cajghn.com/studio" target="_blank">Studio</a>
-        <a href="https://cajghn.com/crypto" target="_blank">Crypto</a>
-        <a href="https://cajghn.com/lounge" target="_blank">Lounge</a>
-        <a href="https://cajghn.com/arcade" target="_blank">Arcade</a>
-        <a href="https://cajghn.com/memo" target="_blank">Memo</a>
+        <a href="#services">Services</a>
+        <a href="#future">Future</a>
+        <a href="#about">About</a>
     </nav>
 </header>
 
 <section class="hero">
     <h1>Explore. Play. Share.</h1>
     <p>An integrated ecosystem of free and premium digital tools, offering 3D assets, crypto prices, online chat, games, and notes—designed for creators, players, and digital enthusiasts.</p>
+    <a class="cta-button" href="#services">Discover More</a>
 </section>
 
 <section class="section" id="services">
@@ -318,32 +273,34 @@
         <h2>Our Services</h2>
         <p>Discover the professional, high-performance digital solutions that constitute the CAJGHN ecosystem. Each service is meticulously engineered to meet the demands of its specific domain.</p>
     </div>
-    
+
     <div class="cards">
         <div class="card">
-            <h3>Studio</h3>
-            <p>A platform where you can freely download high-quality 3D files designed by CAJGHN. Explore and obtain professional-grade assets directly—completely free.</p>
+            <h3>3D Assets</h3>
+            <p>High-quality 3D models and resources crafted for designers, developers, and creators.</p>
         </div>
         <div class="card">
-            <h3>Crypto</h3>
-            <p>A platform to view real-time cryptocurrency prices and market trends, providing up-to-date information at a glance.</p>
+            <h3>Crypto Tools</h3>
+            <p>Live crypto price tracking and utilities tailored for digital asset users.</p>
         </div>
         <div class="card">
-            <h3>Lounge</h3>
-            <p>A place to chat and connect with people from around the world in a simple, secure environment.</p>
+            <h3>Games & Chat</h3>
+            <p>Interactive entertainment and communication tools unified within a single platform.</p>
         </div>
-        <div class="card">
-            <h3>Arcade</h3>
-            <p>Play Coloin, a fun and engaging game, directly on the platform—completely free.</p>
-        </div>
-        <div class="card">
-            <h3>Memo</h3>
-            <p>An online notepad to quickly write, save, and view your notes anytime.</p>
-        </div>
-        <div class="card">
-            <h3>Expansion & Future</h3>
-            <p>CAJGHN continuously evolves, integrating new technologies and services. We maintain an ongoing expansion roadmap to deliver more value to the ecosystem.</p>
-        </div>
+    </div>
+</section>
+
+<section class="section" id="future">
+    <div class="section-header">
+        <h2>Expansion & Future</h2>
+        <p>CAJGHN continuously evolves, integrating new technologies and services. We maintain an ongoing expansion roadmap to deliver more value to the ecosystem.</p>
+    </div>
+</section>
+
+<section class="section" id="about">
+    <div class="section-header">
+        <h2>CAJGHN</h2>
+        <p>A premium digital ecosystem for next-generation professionals. Maximizing your potential through clarity and performance.</p>
     </div>
 </section>
 
@@ -351,35 +308,39 @@
     <div class="footer-grid">
         <div class="footer-about">
             <a class="logo" href="/">CAJGHN</a>
-            <p>A premium digital ecosystem for next-generation professionals. Maximizing your potential through clarity and performance.</p>
+            <p>Empowering creators and innovators through a unified, high-performance digital ecosystem.</p>
         </div>
+
         <div>
-            <h3 class="footer-heading">Product</h3>
+            <h3 class="footer-heading">Explore</h3>
             <ul class="footer-list">
-                <li><a href="https://cajghn.com/features" target="_blank">Features</a></li>
-                <li><a href="https://cajghn.com/documentation" target="_blank">Documentation</a></li>
-                <li><a href="https://cajghn.com/pricing" target="_blank">Pricing</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#future">Future Plan</a></li>
+                <li><a href="#about">About</a></li>
             </ul>
         </div>
+
         <div>
-            <h3 class="footer-heading">Company</h3>
+            <h3 class="footer-heading">Resources</h3>
             <ul class="footer-list">
-                <li><a href="https://cajghn.com/about" target="_blank">About</a></li>
-                <li><a href="https://cajghn.com/contact" target="_blank">Contact</a></li>
-                <li><a href="https://cajghn.com/partners" target="_blank">Partners</a></li>
+                <li><a href="#">3D Assets</a></li>
+                <li><a href="#">Crypto Tools</a></li>
+                <li><a href="#">Games</a></li>
             </ul>
         </div>
+
         <div>
             <h3 class="footer-heading">Connect</h3>
             <ul class="footer-list">
-                <li><a href="https://github.com/CAJGHN" target="_blank">GitHub</a></li>
-                <li><a href="https://youtube.com/@CAJGHN" target="_blank">YouTube</a></li>
-                <li><a href="https://instagram.com/cajghn" target="_blank">Instagram</a></li>
+                <li><a href="#">Twitter</a></li>
+                <li><a href="#">GitHub</a></li>
+                <li><a href="#">Community</a></li>
             </ul>
         </div>
     </div>
+
     <div class="footer-bottom">
-        &copy; 2025 CAJGHN. All Rights Reserved.
+        © 2025 CAJGHN. All rights reserved.
     </div>
 </footer>
 
