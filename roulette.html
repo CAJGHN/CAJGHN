@@ -31,7 +31,7 @@
         flex-direction: column;
         align-items: center;
         min-height: 100vh;
-        padding: 10px;
+        padding: 20px;
     }
 
     header {
@@ -39,14 +39,14 @@
         max-width: 1000px;
         display: flex;
         justify-content: center;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
     }
 
     h1 { 
         margin: 0; 
         color: #ffffff;
-        font-size: 2.2rem; 
+        font-size: 2.5rem; 
         letter-spacing: 2px; 
         font-family: inherit;
         text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
@@ -55,7 +55,7 @@
     .game-container {
         display: flex;
         flex-wrap: wrap;
-        gap: 20px;
+        gap: 40px;
         justify-content: center;
         align-items: center;
         max-width: 1200px;
@@ -78,19 +78,19 @@
     
     .betting-board {
         background: transparent;
-        padding: 10px;
+        padding: 20px;
         flex: 1;
-        min-width: 280px;
-        max-width: 380px;
+        min-width: 300px;
+        max-width: 500px;
         color: #ffffff;
     }
 
     .info-panel {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 10px;
+        margin-bottom: 15px;
         font-weight: bold;
-        font-size: 0.9rem;
+        font-size: 1.1rem;
         align-items: center;
         color: #ffffff;
     }
@@ -98,10 +98,10 @@
     .money-box {
         background-color: rgba(0,0,0,0.3);
         color: var(--accent-gold);
-        padding: 3px 6px;
+        padding: 4px 8px;
         border-radius: 4px;
         display: inline-block;
-        min-width: 50px;
+        min-width: 60px;
         text-align: right;
         border: 1px solid var(--accent-gold);
     }
@@ -110,8 +110,8 @@
     .bet-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 3px;
-        margin-bottom: 10px;
+        gap: 4px;
+        margin-bottom: 15px;
     }
     .bet-zero {
         grid-column: 1 / -1;
@@ -120,13 +120,12 @@
         border: 1px solid var(--accent-gold);
     }
     .bet-cell {
-        padding: 8px;
+        padding: 12px;
         text-align: center;
         border: 1px solid var(--accent-gold);
         cursor: pointer;
         color: white;
         font-weight: bold;
-        font-size: 0.9rem;
         border-radius: 4px;
         transition: transform 0.1s, opacity 0.2s;
         position: relative;
@@ -137,10 +136,10 @@
     
     .bet-amount-text {
         position: absolute;
-        bottom: 1px;
-        right: 3px;
+        bottom: 2px;
+        right: 4px;
         color: var(--accent-gold-shine); 
-        font-size: 10px;
+        font-size: 12px;
         font-weight: bold;
         text-shadow: 0 0 3px black;
         pointer-events: none;
@@ -149,18 +148,18 @@
 
     .outside-bets {
         display: flex;
-        gap: 3px;
-        margin-top: 8px;
+        gap: 4px;
+        margin-top: 10px;
     }
     .outside-bet {
         flex: 1;
-        padding: 8px;
+        padding: 10px;
         text-align: center;
         background: transparent;
         border: 2px solid var(--accent-gold);
         cursor: pointer;
         border-radius: 4px;
-        font-size: 0.8rem;
+        font-size: 0.9rem;
         position: relative;
         transition: all 0.2s;
         color: #ffffff;
@@ -172,13 +171,13 @@
     .outside-bet.bg-black { background-color: var(--black); color: white; border: 2px solid var(--accent-gold); }
 
     .controls {
-        margin-top: 15px;
+        margin-top: 20px;
         display: flex;
-        gap: 8px;
+        gap: 10px;
         align-items: center;
         justify-content: space-between;
         background: transparent;
-        padding: 10px 0;
+        padding: 15px 0;
         border-top: 1px solid var(--accent-gold);
         color: #ffffff;
     }
@@ -187,21 +186,20 @@
         background: rgba(0,0,0,0.3);
         border: 2px solid var(--accent-gold);
         color: var(--accent-gold);
-        padding: 6px;
+        padding: 8px;
         border-radius: 6px;
-        width: 70px;
+        width: 80px;
         text-align: right;
         font-weight: bold;
-        font-size: 0.9rem;
     }
 
     button.action-btn {
-        padding: 8px 16px;
+        padding: 10px 20px;
         border-radius: 4px;
         font-weight: bold;
         cursor: pointer;
         text-transform: uppercase;
-        font-size: 0.9rem;
+        font-size: 1rem;
         
         background: transparent;
         border: 2px solid var(--accent-gold);
@@ -214,6 +212,7 @@
         flex-grow: 1; 
     }
     
+    /* Disabled 상태일 때도 원래 모습 그대로 유지 */
     .btn-spin:disabled { 
         opacity: 1; 
         cursor: default; 
@@ -267,17 +266,16 @@
     }
 
     .copyright {
-        margin-top: 30px;
+        margin-top: 40px;
         color: #ffffff;
-        font-size: 0.8rem;
+        font-size: 0.9rem;
         opacity: 0.8;
         text-align: center;
     }
 
     @media (max-width: 800px) {
         .game-container { flex-direction: column; align-items: center; }
-        canvas { width: 360px; height: 360px; }
-        .betting-board { max-width: 100%; width: 360px; }
+        canvas { width: 320px; height: 320px; }
     }
 </style>
 </head>
@@ -289,13 +287,13 @@
 
     <div class="game-container">
         <div class="wheel-section">
-            <canvas id="wheelCanvas" width="520" height="520"></canvas>
+            <canvas id="wheelCanvas" width="480" height="480"></canvas>
         </div>
 
         <div class="betting-board">
             <div class="info-panel">
                 <span>Balance: <span class="money-box"><span id="balance" class="money">1000</span></span></span>
-                <span>Bets: <span class="money-box"><span id="currentBetTotal" class="money">0</span></span></span>
+                <span>Current Bets: <span class="money-box"><span id="currentBetTotal" class="money">0</span></span></span>
             </div>
 
             <div id="numberGrid" class="bet-grid">
@@ -311,7 +309,7 @@
 
             <div class="controls">
                 <div>
-                    <span style="font-size:0.75rem; display:block; margin-bottom:2px; font-weight:bold;">Chip</span>
+                    <span style="font-size:0.8rem; display:block; margin-bottom:4px; font-weight:bold;">Chip Size</span>
                     <input type="number" id="betAmount" value="10" min="1">
                 </div>
                 <button id="clearBtn" class="action-btn btn-clear">Clear</button>
@@ -496,18 +494,18 @@
         wheelAngle = normalizeAngle(wheelAngle);
         ballAngle = normalizeAngle(ballAngle);
 
-        const targetWheelAngle = wheelAngle + (Math.PI * 2 * (4 + Math.random() * 4)) + Math.random() * Math.PI * 2;
-        const targetBallAngle = ballAngle - (Math.PI * 2 * (6 + Math.random() * 4)) - Math.random() * Math.PI * 2;
+        const targetWheelAngle = wheelAngle + (Math.PI * 2 * (5 + Math.random() * 5)) + Math.random() * Math.PI * 2;
+        const targetBallAngle = ballAngle - (Math.PI * 2 * (8 + Math.random() * 5)) - Math.random() * Math.PI * 2;
 
         let startTime = null;
 
         function animateSpin(timestamp) {
             if (!startTime) startTime = timestamp;
             const elapsed = timestamp - startTime;
-            const progress = Math.min(elapsed / 12000, 1); 
+            const progress = Math.min(elapsed / 6000, 1); 
 
-            wheelAngle = wheelAngle + (targetWheelAngle - wheelAngle) * 0.015; 
-            ballAngle = ballAngle + (targetBallAngle - ballAngle) * 0.015;
+            wheelAngle = wheelAngle + (targetWheelAngle - wheelAngle) * 0.05; 
+            ballAngle = ballAngle + (targetBallAngle - ballAngle) * 0.05;
 
             drawWheel();
             drawBall();
