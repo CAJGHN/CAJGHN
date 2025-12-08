@@ -308,14 +308,14 @@
 
         <div class="betting-board">
             <div class="info-panel">
-                <span>Balance: <span class="money-box"><span id="balance" class="money">1000</span></span></span>
+                <span>Balance: <span class="money-box"><span id="balance" class="money">10000</span></span></span>
                 <span>Current Bet: <span class="money-box"><span id="currentBetDisplay" class="money">0</span></span></span>
             </div>
 
             <div class="controls">
                 <div>
                     <span style="font-size:0.8rem; display:block; margin-bottom:4px; font-weight:bold;">Chip Size</span>
-                    <input type="number" id="betAmount" value="10" min="10" step="10">
+                    <input type="number" id="betAmount" value="100" min="100" step="100" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
                 </div>
                 
                 <button id="btnDeal" class="action-btn">DEAL</button>
@@ -334,7 +334,7 @@
     </div>
 
 <script>
-    let balance = 1000;
+    let balance = 10000;
     let currentBet = 0;
     let deck = [];
     let playerHand = [];
@@ -460,8 +460,8 @@
         if (gameActive) return;
 
         const amount = parseInt(inputBet.value);
-        if (isNaN(amount) || amount <= 0) {
-            alert("Please enter a valid bet.");
+        if (isNaN(amount) || amount < 100) {
+            alert("Minimum bet is 100.");
             return;
         }
         if (amount > balance) {
