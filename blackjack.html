@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CAJGHN Blackjack</title>
+<title>CAJGHN Casino - Blackjack</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
     :root {
         --wood-dark: #4a3b30;
@@ -51,6 +52,12 @@
         letter-spacing: 2px; 
         font-family: inherit;
         text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+    h1:hover {
+        color: var(--accent-gold);
     }
 
     .game-container {
@@ -225,6 +232,11 @@
     button.action-btn:not(:disabled) {
         cursor: pointer;
     }
+    
+    button.action-btn:disabled {
+        opacity: 0.5;
+        border-color: #777;
+    }
 
     .win-overlay {
         position: fixed;
@@ -283,7 +295,7 @@
 <body>
 
     <header>
-        <h1>CAJGHN Blackjack</h1>
+        <h1 onclick="location.href='casino.html'">CAJGHN Casino</h1>
     </header>
 
     <div class="game-container">
@@ -308,7 +320,7 @@
 
         <div class="betting-board">
             <div class="info-panel">
-                <span>Balance: <span class="money-box"><span id="balance" class="money">10000</span></span></span>
+                <span>Balance: <span class="money-box"><span id="balance" class="money">...</span></span></span>
                 <span>Current Bet: <span class="money-box"><span id="currentBetDisplay" class="money">0</span></span></span>
             </div>
 
@@ -334,8 +346,14 @@
     </div>
 
 <script>
-    let balance = 10000;
+    const SUPABASE_URL = "https://nzdbalmwypdixduickzv.supabase.co"; 
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56ZGJhbG13eXBkaXhkdWlja3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNjc0MjgsImV4cCI6MjA4MDk0MzQyOH0.xskVDK0fIedVzC74bluatdhzXHY8ujKJVCQTiVcy824";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let balance = 0;
     let currentBet = 0;
+    
     let deck = [];
     let playerHand = [];
     let dealerHand = [];
@@ -361,6 +379,41 @@
 
     const SUITS = ['♠', '♥', '♣', '♦'];
     const VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+    async function initGame() {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+            alert("Login required.");
+            window.location.href = "casino.html";
+            return;
+        }
+
+        currentUser = session.user;
+        await fetchBalance();
+        
+        btnDeal.disabled = false;
+        btnHit.disabled = true;
+        btnStand.disabled = true;
+    }
+
+    async function fetchBalance() {
+        const { data, error } = await supabase
+            .from('users')
+            .select('point')
+            .eq('id', currentUser.id)
+            .single();
+
+        if (data) {
+            balance = data.point;
+            updateUI();
+        }
+    }
+
+    function updateUI() {
+        elBalance.textContent = balance.toLocaleString();
+        elBetDisplay.textContent = currentBet.toLocaleString();
+    }
 
     function createDeck() {
         deck = [];
@@ -455,9 +508,10 @@
         }
     }
 
-
-    function startGame() {
+    async function startGame() {
         if (gameActive) return;
+
+        await fetchBalance();
 
         const amount = parseInt(inputBet.value);
         if (isNaN(amount) || amount < 100) {
@@ -469,15 +523,26 @@
             return;
         }
 
+        const newBalance = balance - amount;
+        const { error } = await supabase
+            .from('users')
+            .update({ point: newBalance })
+            .eq('id', currentUser.id);
+
+        if (error) {
+            alert("Betting error: " + error.message);
+            return;
+        }
+
+        balance = newBalance;
+        currentBet = amount;
+        updateUI();
+
         createDeck();
         playerHand = [];
         dealerHand = [];
         gameActive = true;
         
-        currentBet = amount;
-        balance -= currentBet;
-        updateUI();
-
         playerHand.push(getCard());
         dealerHand.push(getCard());
         playerHand.push(getCard());
@@ -526,7 +591,7 @@
         }, 800); 
     }
 
-    function handleGameOver() {
+    async function handleGameOver() {
         gameActive = false;
         renderHands(true);
 
@@ -535,6 +600,7 @@
         
         let winMultiplier = 0;
         let isWin = false;
+        let isPush = false;
 
         if (pScore > 21) {
             winMultiplier = 0;
@@ -551,11 +617,19 @@
             winMultiplier = 0;
         } else {
             winMultiplier = 1;
+            isPush = true;
         }
 
         const winnings = Math.floor(currentBet * winMultiplier);
+        
         if (winnings > 0) {
-            balance += winnings;
+            const newBalance = balance + winnings;
+            await supabase
+                .from('users')
+                .update({ point: newBalance })
+                .eq('id', currentUser.id);
+            
+            balance = newBalance; 
         }
 
         updateUI();
@@ -568,12 +642,20 @@
         if (isWin) {
             setTimeout(() => {
                 elWinTitle.textContent = "YOU WIN!";
+                elWinTitle.style.color = "#ffffff";
                 elWinAmount.textContent = "+" + winnings;
+                winOverlay.classList.add('show');
+            }, 500);
+        } else if (isPush) {
+            setTimeout(() => {
+                elWinTitle.textContent = "PUSH";
+                elWinTitle.style.color = "#aaaaaa";
+                elWinAmount.textContent = "+" + winnings; 
                 winOverlay.classList.add('show');
             }, 500);
         } else {
             currentBet = 0;
-            elBetDisplay.textContent = 0;
+            updateUI();
         }
     }
 
@@ -591,21 +673,12 @@
         elDealerScore.textContent = '0';
     }
 
-    function updateUI() {
-        elBalance.textContent = balance;
-        elBetDisplay.textContent = currentBet;
-    }
-
+    winOverlay.addEventListener('click', resetGameUI);
     btnDeal.addEventListener('click', startGame);
     btnHit.addEventListener('click', hit);
     btnStand.addEventListener('click', stand);
-    
-    winOverlay.addEventListener('click', resetGameUI);
 
-    createDeck();
-    btnDeal.disabled = false;
-    btnHit.disabled = true;
-    btnStand.disabled = true;
+    initGame();
 
 </script>
 </body>
