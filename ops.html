@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAJGHN OPS</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --bg-core: #0a0e17;
+        --bg-panel: rgba(20, 27, 45, 0.95);
+        --border: rgba(226, 176, 74, 0.25);
+        --accent: #e2b04a;
+        --accent-hover: #cfa945;
+        --text: #eaeaea;
+        --text-sub: #94a3b8;
+        --danger: #ef4444;
+        --success: #10b981;
+        --vvip: #d8b4fe;
+        --vip: #60a5fa;
+        --high: #2dd4bf;
+    }
+
+    * { box-sizing: border-box; outline: none; user-select: none; }
+    
+    body {
+        margin: 0;
+        background-color: var(--bg-core);
+        background-image: radial-gradient(circle at 50% 0%, #1e243d 0%, var(--bg-core) 80%);
+        color: var(--text);
+        font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    #login-screen {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: var(--bg-core); z-index: 9999;
+        display: flex; justify-content: center; align-items: center;
+        flex-direction: column;
+        background-image: radial-gradient(circle at 50% 50%, #1a2138 0%, #05080f 80%);
+    }
+    .login-box {
+        background: rgba(20, 27, 45, 0.8); padding: 50px 40px; border-radius: 20px;
+        border: 1px solid var(--border); width: 400px; text-align: center;
+        box-shadow: 0 0 60px rgba(226, 176, 74, 0.1);
+        backdrop-filter: blur(15px);
+    }
+    .login-input {
+        width: 100%; padding: 15px; margin-bottom: 15px;
+        background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border);
+        color: var(--accent); border-radius: 10px; font-size: 1.2rem;
+        text-align: center; letter-spacing: 4px; transition: 0.3s;
+        font-weight: bold;
+    }
+    .login-input::placeholder { color: rgba(226, 176, 74, 0.3); letter-spacing: 0px; font-weight: normal; font-size: 0.95rem; }
+    .login-input:focus { border-color: var(--accent); box-shadow: 0 0 20px rgba(226, 176, 74, 0.2); }
+    
+    .login-btn {
+        width: 100%; padding: 15px; background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+        color: #000; font-weight: 800; border: none;
+        border-radius: 10px; cursor: pointer; font-size: 1.1rem; margin-top: 10px;
+        box-shadow: 0 10px 30px rgba(226, 176, 74, 0.2); transition: 0.3s;
+    }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(226, 176, 74, 0.3); }
+
+    #app-container { display: none; width: 100%; height: 100%; }
+
+    .sidebar {
+        width: 280px; background: var(--bg-panel);
+        border-right: 1px solid var(--border); padding: 30px 20px;
+        display: flex; flex-direction: column; z-index: 20;
+    }
+    .brand {
+        font-size: 1.6rem; font-weight: 900; color: var(--accent); margin-bottom: 40px;
+        letter-spacing: 1px; display: flex; align-items: center; gap: 12px;
+        text-shadow: 0 0 20px rgba(226, 176, 74, 0.4); justify-content: center;
+    }
+    .nav-btn {
+        padding: 14px 20px; border-radius: 12px; color: var(--text-sub); cursor: pointer; margin-bottom: 8px;
+        display: flex; align-items: center; gap: 15px; font-weight: 600; transition: 0.2s;
+        border: 1px solid transparent; font-size: 0.95rem;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.03); color: var(--text); border-color: rgba(255,255,255,0.05); }
+    .nav-btn.active { 
+        background: rgba(226, 176, 74, 0.1); color: var(--accent); 
+        border: 1px solid rgba(226, 176, 74, 0.3);
+        box-shadow: 0 0 15px rgba(226, 176, 74, 0.05);
+    }
+
+    .sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 15px; }
+    
+    .manual-refresh-btn {
+        background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--accent);
+        padding: 12px; border-radius: 10px; cursor: pointer; text-align: center;
+        transition: 0.2s; font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 8px;
+        font-size: 0.9rem;
+    }
+    .manual-refresh-btn:hover { background: var(--accent); color: #000; }
+    .manual-refresh-btn:active { transform: scale(0.98); }
+
+    .toggle-wrap { 
+        display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.85rem; 
+        color: var(--text-sub); cursor: pointer; padding: 5px; 
+    }
+    .toggle-switch {
+        width: 40px; height: 20px; background: #1e293b; border-radius: 20px; position: relative; transition: 0.3s; border:1px solid var(--border);
+    }
+    .toggle-switch::after {
+        content:''; position: absolute; width: 14px; height: 14px; background: #64748b; border-radius: 50%;
+        top: 2px; left: 3px; transition: 0.3s;
+    }
+    .toggle-active .toggle-switch { background: rgba(16, 185, 129, 0.15); border-color: var(--success); }
+    .toggle-active .toggle-switch::after { left: 21px; background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+    .main { flex: 1; padding: 30px; display: flex; flex-direction: column; gap: 25px; overflow: hidden; position: relative; }
+
+    .clock-widget {
+        display: flex; justify-content: space-between; align-items: flex-end;
+        padding-bottom: 20px; border-bottom: 1px solid var(--border);
+    }
+    .clock-time { font-size: 2.8rem; font-weight: 800; color: var(--text); letter-spacing: 2px; font-variant-numeric: tabular-nums; text-shadow: 0 0 30px rgba(0,0,0,0.5); }
+    .clock-date { font-size: 1rem; color: var(--accent); font-weight: 600; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .kpi-card {
+        background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px; padding: 25px;
+        position: relative; overflow: hidden; transition: 0.3s; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .kpi-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+    .kpi-val { font-size: 2rem; font-weight: 800; color: var(--text); margin-top: 10px; }
+    .kpi-title { font-size: 0.85rem; color: var(--text-sub); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-icon { position: absolute; right: 20px; bottom: 20px; font-size: 3.5rem; opacity: 0.05; color: white; pointer-events: none; }
+
+    .control-bar {
+        background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px; padding: 15px 25px;
+        display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .search-input {
+        background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: var(--text);
+        padding: 12px 15px; border-radius: 10px; width: 300px; font-family: inherit; font-size: 0.95rem; transition: 0.3s;
+    }
+    .search-input:focus { border-color: var(--accent); }
+
+    .batch-group { display: flex; gap: 10px; opacity: 0.3; pointer-events: none; transition: 0.3s; }
+    .batch-group.active { opacity: 1; pointer-events: auto; }
+    
+    .btn { padding: 10px 18px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-size: 0.9rem; transition: 0.2s; }
+    .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    .btn-gold { background: linear-gradient(135deg, var(--accent), #b48a3c); color: #000; }
+    .btn-warn { background: linear-gradient(135deg, #f97316, #c2410c); color: white; }
+    .btn-danger { background: linear-gradient(135deg, var(--danger), #b91c1c); color: white; }
+    .btn-green { background: linear-gradient(135deg, var(--success), #047857); color: white; display: flex; align-items: center; gap: 6px; }
+
+    .table-wrap {
+        flex: 1; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 16px;
+        overflow-y: auto; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    .table-wrap::-webkit-scrollbar { width: 8px; }
+    .table-wrap::-webkit-scrollbar-thumb { background: rgba(226, 176, 74, 0.2); border-radius: 4px; }
+    
+    table { width: 100%; border-collapse: separate; border-spacing: 0; }
+    thead { position: sticky; top: 0; z-index: 10; background: rgba(10, 14, 23, 0.95); backdrop-filter: blur(10px); }
+    th { padding: 18px 15px; color: var(--text-sub); font-size: 0.85rem; text-align: left; border-bottom: 1px solid var(--border); font-weight: 700; }
+    td { padding: 16px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text); font-size: 0.95rem; vertical-align: middle; }
+    tr:hover td { background: rgba(226, 176, 74, 0.03); }
+    tr.selected td { background: rgba(226, 176, 74, 0.1) !important; }
+
+    .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; border: 1px solid rgba(255,255,255,0.1); }
+    .badge-vvip { background: rgba(216, 180, 254, 0.1); color: var(--vvip); border-color: var(--vvip); box-shadow: 0 0 10px rgba(216, 180, 254, 0.2); }
+    .badge-vip { background: rgba(96, 165, 250, 0.1); color: var(--vip); border-color: var(--vip); }
+    .badge-high { background: rgba(45, 212, 191, 0.1); color: var(--high); border-color: var(--high); }
+
+    .id-copy { cursor: copy; font-family: 'Courier New', monospace; opacity: 0.7; transition: 0.2s; }
+    .id-copy:hover { color: var(--accent); opacity: 1; text-decoration: underline; }
+
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+        display: none; justify-content: center; align-items: center; z-index: 100; opacity: 0; transition: 0.3s;
+    }
+    .modal-overlay.open { opacity: 1; }
+    .modal-box { 
+        background: #141b2d; width: 500px; padding: 35px; border-radius: 20px; 
+        border: 1px solid var(--border); transform: scale(0.95); transition: 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+    }
+    .modal-overlay.open .modal-box { transform: scale(1); }
+
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; color: var(--text-sub); font-size: 0.85rem; margin-bottom: 8px; font-weight: 600; }
+    .form-input { 
+        width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); 
+        color: white; border-radius: 8px; font-size: 1rem;
+    }
+    .form-input:focus { border-color: var(--accent); }
+
+    .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+    .q-btn { 
+        background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: var(--text-sub); 
+        padding: 10px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.85rem;
+    }
+    .q-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(226, 176, 74, 0.1); }
+
+    .manual-head { color: var(--accent); font-weight: bold; margin-top: 25px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .manual-list li { margin-bottom: 8px; color: #cbd5e1; font-size: 0.95rem; line-height: 1.5; }
+
+    #toast {
+        position: fixed; bottom: 30px; right: 30px; background: #1e293b; border-left: 4px solid var(--accent);
+        padding: 16px 24px; border-radius: 12px; display: flex; align-items: center; gap: 12px;
+        transform: translateY(100px); opacity: 0; transition: 0.4s; z-index: 200; box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+        border: 1px solid rgba(255,255,255,0.1); font-weight: 600;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <h1 style="color:var(--accent); font-size:2.4rem; margin-bottom:40px; letter-spacing:2px; text-shadow: 0 0 30px rgba(226, 176, 74, 0.5);">PRIME ACCESS</h1>
+        <div class="login-box">
+            <i class="fa-solid fa-fingerprint" style="font-size:3.5rem; color:var(--accent); margin-bottom:30px; opacity:0.8;"></i>
+            
+            <input type="text" style="display:none;" autocomplete="username">
+            <input type="password" style="display:none;" autocomplete="current-password">
+
+            <input type="password" id="adminPw" class="login-input" placeholder="ACCESS CODE" maxlength="4" autocomplete="new-password">
+            <button class="login-btn" onclick="tryLogin()">시스템 접속</button>
+            <div id="loginMsg" style="color:var(--danger); margin-top:20px; font-size:0.9rem; height:20px; font-weight:bold;"></div>
+        </div>
+    </div>
+
+    <div id="app-container">
+        <div class="sidebar">
+            <div class="brand">
+                CAJGHN OPS
+            </div>
+            
+            <div class="nav-btn active"><i class="fa-solid fa-chart-pie"></i> 대시보드</div>
+            <div class="nav-btn" onclick="openModal('manualModal')"><i class="fa-solid fa-book-bookmark"></i> 시스템 매뉴얼</div>
+            <div class="nav-btn" onclick="downloadCSV()"><i class="fa-solid fa-file-arrow-down"></i> 데이터 백업</div>
+
+            <div class="sidebar-footer">
+                <div class="manual-refresh-btn" onclick="safeFetchData()">
+                    <i class="fa-solid fa-rotate"></i> 데이터 새로고침
+                </div>
+                <div class="toggle-wrap" id="autoRefBtn" onclick="toggleAutoRefresh()">
+                    <div class="toggle-switch"></div>
+                    <span>자동 감시 (5초)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="clock-widget">
+                <div class="clock-date" id="clockDate">시스템 시간 동기화 중...</div>
+                <div class="clock-time" id="clockTime">00:00:00</div>
+            </div>
+
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-title">등록 유저</div>
+                    <div class="kpi-val" id="kpi-users">-</div>
+                    <i class="fa-solid fa-users kpi-icon"></i>
+                </div>
+                <div class="kpi-card" style="border-color: rgba(226, 176, 74, 0.4);">
+                    <div class="kpi-title" style="color:var(--accent)">총 경제 규모</div>
+                    <div class="kpi-val" id="kpi-total" style="color:var(--accent)">-</div>
+                    <i class="fa-solid fa-coins kpi-icon" style="opacity:0.1; color:var(--accent)"></i>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">최고 자산액</div>
+                    <div class="kpi-val" id="kpi-top">-</div>
+                    <i class="fa-solid fa-trophy kpi-icon" style="color:var(--vvip)"></i>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-title">평균 자산액</div>
+                    <div class="kpi-val" id="kpi-avg">-</div>
+                    <i class="fa-solid fa-chart-line kpi-icon" style="color:var(--high)"></i>
+                </div>
+            </div>
+
+            <div class="control-bar">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <input type="text" class="search-input" id="searchInput" placeholder="ID 또는 닉네임 검색..." onkeyup="filterData()">
+                    <button class="btn btn-green" onclick="openCreateModal()">
+                        <i class="fa-solid fa-user-plus"></i> 신규 등록
+                    </button>
+                    <span id="selectLabel" style="font-size:0.9rem; color:var(--text-sub); display:none; margin-left:10px;">
+                        <b style="color:var(--accent);" id="selectCount">0</b> 명 선택됨
+                    </span>
+                </div>
+                <div class="batch-group" id="batchGroup">
+                    <button class="btn btn-gold" onclick="batchAction('bonus')"><i class="fa-solid fa-gift"></i> 지급</button>
+                    <button class="btn btn-warn" onclick="batchAction('reset')"><i class="fa-solid fa-gavel"></i> 압수</button>
+                    <button class="btn btn-danger" onclick="batchAction('delete')"><i class="fa-solid fa-trash"></i> 삭제</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="5%" style="text-align:center;"><input type="checkbox" id="checkAll" onchange="toggleAll()"></th>
+                            <th width="5%">No.</th>
+                            <th width="20%">실명 ID</th>
+                            <th width="25%">닉네임 / 등급</th>
+                            <th width="20%">보유 포인트</th>
+                            <th width="15%">가입일자</th>
+                            <th width="10%" style="text-align:center;">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <h2 style="margin-top:0; color:var(--accent);"><i class="fa-solid fa-user-pen"></i> 정보 수정</h2>
+            <input type="hidden" id="targetId">
+            
+            <div class="form-group">
+                <label class="form-label">닉네임 변경</label>
+                <input type="text" id="editName" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">포인트 조정 (증감액 입력)</label>
+                <input type="number" id="editAmount" class="form-input" placeholder="+/- 숫자 입력">
+            </div>
+
+            <div class="quick-grid">
+                <button class="q-btn" onclick="addQ(10000)">+1만</button>
+                <button class="q-btn" onclick="addQ(100000)">+10만</button>
+                <button class="q-btn" onclick="addQ(1000000)">+100만</button>
+                <button class="q-btn" onclick="addQ(10000000)">+1000만</button>
+                <button class="q-btn" onclick="addQ(-10000)">-1만</button>
+                <button class="q-btn" onclick="addQ(-100000)">-10만</button>
+                <button class="q-btn" onclick="addQ(-1000000)">-100만</button>
+                <button class="q-btn" style="color:var(--danger); border-color:var(--danger);" onclick="setZero()">전액 몰수</button>
+            </div>
+
+            <div style="display:flex; gap:15px; margin-top:30px;">
+                <button class="btn btn-danger" style="flex:1" onclick="deleteSingle()">계정 삭제</button>
+                <button class="btn btn-gold" style="flex:2" onclick="saveSingle()">저장 하기</button>
+            </div>
+            <div style="text-align:center; margin-top:20px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('editModal')">닫기</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="createModal">
+        <div class="modal-box">
+            <h2 style="margin-top:0; color:var(--success);"><i class="fa-solid fa-user-plus"></i> 신규 유저 등록</h2>
+            <div class="form-group">
+                <label class="form-label">실명 ID (로그인용)</label>
+                <input type="text" id="newId" class="form-input" placeholder="영문/숫자 입력">
+            </div>
+            <div class="form-group">
+                <label class="form-label">닉네임</label>
+                <input type="text" id="newName" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">초기 지급 포인트</label>
+                <input type="number" id="newPoint" class="form-input" value="0">
+            </div>
+            <button class="btn btn-green" style="width:100%; justify-content:center; padding:14px; margin-top:10px;" onclick="createNewUser()">등록 완료</button>
+            <div style="text-align:center; margin-top:20px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('createModal')">취소</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="batchModal">
+        <div class="modal-box">
+            <h2 id="batchTitle" style="margin-top:0; color:var(--text);">일괄 작업 확인</h2>
+            <p>선택된 대상: <b style="color:var(--accent); font-size:1.2rem;" id="batchCountNum">0</b> 명</p>
+            <div id="batchInputArea" class="form-group" style="margin-top:20px;">
+                <label class="form-label">적용할 금액</label>
+                <input type="number" id="batchAmount" class="form-input" placeholder="금액 입력">
+            </div>
+            <button class="btn btn-gold" style="width:100%; margin-top:20px; justify-content:center; padding:14px;" onclick="executeBatch()">작업 실행</button>
+            <div style="text-align:center; margin-top:20px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('batchModal')">취소</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="manualModal">
+        <div class="modal-box" style="width:600px; max-height:80vh; display:flex; flex-direction:column;">
+            <h2 style="margin-top:0; color:var(--accent);"><i class="fa-solid fa-book"></i> 관리자 매뉴얼</h2>
+            <div style="overflow-y:auto; flex:1; padding-right:10px;">
+                <div class="manual-head">1. 보안 접속</div>
+                <ul class="manual-list">
+                    <li>관리자에게 부여받은 <b>보안 코드</b>를 입력하여 시스템에 접속합니다.</li>
+                    <li>로그인 세션은 새로고침 시 초기화됩니다.</li>
+                </ul>
+                <div class="manual-head">2. 유저 관리</div>
+                <ul class="manual-list">
+                    <li><b>신규 등록:</b> 상단 <span style="color:var(--success)">+ 신규 등록</span> 버튼을 통해 계정을 생성합니다.</li>
+                    <li><b>수정/삭제:</b> 리스트 우측 연필 버튼으로 자산 조정 및 계정 삭제가 가능합니다.</li>
+                </ul>
+                <div class="manual-head">3. 일괄 작업</div>
+                <ul class="manual-list">
+                    <li>리스트 좌측 체크박스를 선택하면 일괄 작업 메뉴가 활성화됩니다.</li>
+                    <li>보너스 지급, 전액 압수, 영구 삭제 기능을 지원합니다.</li>
+                </ul>
+                <div class="manual-head">4. 데이터 보안</div>
+                <ul class="manual-list">
+                    <li>좌측 메뉴의 <b>데이터 백업</b>을 통해 CSV 파일로 데이터를 저장할 수 있습니다.</li>
+                </ul>
+            </div>
+            <div style="text-align:center; margin-top:20px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('manualModal')">닫기</div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        let supabase = null;
+        let allUsers = [];
+        let selectedIds = new Set();
+        let currentBatchType = '';
+        let autoRefreshInterval = null;
+
+        const SUPABASE_URL = "https://nzdbalmwypdixduickzv.supabase.co"; 
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56ZGJhbG13eXBkaXhkdWlja3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNjc0MjgsImV4cCI6MjA4MDk0MzQyOH0.xskVDK0fIedVzC74bluatdhzXHY8ujKJVCQTiVcy824";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const pwInput = document.getElementById('adminPw');
+            if(pwInput) pwInput.value = '';
+
+            if (window.supabase) {
+                try {
+                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                } catch (e) {
+                    console.error("Supabase Init Error:", e);
+                    alert("데이터베이스 연결 실패. 페이지를 새로고침 해주세요.");
+                }
+            } else {
+                alert("필수 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인하세요.");
+            }
+
+            setInterval(updateClock, 1000);
+            updateClock();
+            
+            if(pwInput) {
+                pwInput.addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter') tryLogin();
+                });
+                pwInput.focus();
+            }
+        });
+
+        function updateClock() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
+            const timeStr = now.toLocaleTimeString('ko-KR', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            
+            const dateEl = document.getElementById('clockDate');
+            const timeEl = document.getElementById('clockTime');
+            if(dateEl) dateEl.innerText = dateStr;
+            if(timeEl) timeEl.innerText = timeStr;
+        }
+
+        function tryLogin() {
+            const pwInput = document.getElementById('adminPw');
+            const pw = pwInput.value;
+            const msg = document.getElementById('loginMsg');
+            
+            if (pw === "0725") {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-container').style.display = 'flex';
+                safeFetchData();
+            } else {
+                const box = document.querySelector('.login-box');
+                box.style.transform = "translateX(5px)";
+                setTimeout(() => box.style.transform = "translateX(0)", 100);
+                msg.innerText = "보안 코드가 일치하지 않습니다.";
+                pwInput.value = '';
+                pwInput.focus();
+            }
+        }
+
+        async function safeFetchData(silent = false) {
+            if (!supabase) return;
+
+            try {
+                const { data, error } = await supabase.from('users').select('*').order('point', { ascending: false });
+                
+                if (error) throw error;
+                
+                allUsers = data || [];
+                updateDashboard(allUsers);
+                renderTable(allUsers);
+                
+                if (!silent) showToast("시스템 데이터 갱신 완료", "success");
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                if (!silent) showToast("데이터 로드 실패: 네트워크 확인 필요", "error");
+            }
+        }
+
+        function updateDashboard(data) {
+            const total = data.reduce((a, c) => a + (c.point || 0), 0);
+            const top = data.length > 0 ? data[0].point : 0;
+            const avg = data.length > 0 ? Math.floor(total / data.length) : 0;
+
+            document.getElementById('kpi-users').innerText = data.length + " 명";
+            document.getElementById('kpi-total').innerText = total.toLocaleString();
+            document.getElementById('kpi-top').innerText = top.toLocaleString();
+            document.getElementById('kpi-avg').innerText = avg.toLocaleString();
+        }
+
+        function renderTable(users) {
+            const tbody = document.getElementById('tableBody');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+
+            users.forEach((u, idx) => {
+                const isSel = selectedIds.has(u.real_id);
+                const isKing = (idx === 0);
+                
+                let rowClass = '';
+                let badge = '';
+                
+                const point = u.point || 0;
+
+                if (point >= 100000000) { 
+                    rowClass = 'row-vvip'; 
+                    badge = `<span class="badge badge-vvip"><i class="fa-solid fa-crown"></i> VVIP</span>`; 
+                } else if (point >= 10000000) { 
+                    badge = `<span class="badge badge-vip">VIP</span>`; 
+                } else if (point >= 5000000) { 
+                    badge = `<span class="badge badge-high">High</span>`; 
+                }
+
+                let dateStr = "-";
+                if(u.created_at) {
+                    const d = new Date(u.created_at);
+                    const now = new Date();
+                    const diffTime = Math.abs(now - d);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                    dateStr = `D+${diffDays}일`;
+                }
+
+                const tr = document.createElement('tr');
+                if (isSel) tr.classList.add('selected');
+                
+                tr.innerHTML = `
+                    <td style="text-align:center;"><input type="checkbox" ${isSel ? 'checked' : ''} onchange="toggleUser('${u.real_id}')"></td>
+                    <td style="color:var(--text-sub); font-weight:600;">${idx + 1}</td>
+                    <td><span class="id-copy" onclick="copyId('${u.real_id}')">${u.real_id}</span></td>
+                    <td><div style="display:flex; align-items:center; gap:8px; font-weight:600;">${isKing ? '<i class="fa-solid fa-crown" style="color:var(--accent);"></i>' : ''}${u.name} ${badge}</div></td>
+                    <td style="font-weight:800; color:var(--text); letter-spacing:0.5px;">${point.toLocaleString()}</td>
+                    <td style="color:var(--text-sub); font-size:0.85rem;">${dateStr}</td>
+                    <td style="text-align:center;"><button class="q-btn" style="padding:6px 10px;" onclick="openEdit('${u.real_id}')"><i class="fa-solid fa-pen"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateBatchUI();
+        }
+
+        function openCreateModal() {
+            document.getElementById('newId').value = '';
+            document.getElementById('newName').value = '';
+            document.getElementById('newPoint').value = 0;
+            openModal('createModal');
+        }
+
+        async function createNewUser() {
+            if (!supabase) return;
+            const id = document.getElementById('newId').value.trim();
+            const name = document.getElementById('newName').value.trim();
+            const point = parseInt(document.getElementById('newPoint').value) || 0;
+
+            if (!id || !name) { showToast("ID와 닉네임을 모두 입력하세요.", "error"); return; }
+
+            try {
+                const { error } = await supabase.from('users').insert({ real_id: id, name: name, point: point });
+                if (error) throw error;
+                
+                showToast("유저 생성 완료", "success");
+                closeModal('createModal');
+                safeFetchData(true);
+            } catch (err) {
+                showToast("생성 실패: ID 중복 등 확인 필요", "error");
+            }
+        }
+
+        function openEdit(id) {
+            const u = allUsers.find(x => x.real_id === id);
+            if (!u) return;
+
+            document.getElementById('targetId').value = u.real_id;
+            document.getElementById('editName').value = u.name;
+            document.getElementById('editAmount').value = '';
+            openModal('editModal');
+        }
+
+        async function saveSingle() {
+            if (!supabase) return;
+            const id = document.getElementById('targetId').value;
+            const name = document.getElementById('editName').value;
+            const amountInput = document.getElementById('editAmount').value;
+            const amount = parseInt(amountInput);
+
+            const user = allUsers.find(x => x.real_id === id);
+            if (!user) return;
+
+            let newPoint = user.point;
+            if (!isNaN(amount)) newPoint += amount;
+
+            try {
+                const { error } = await supabase.from('users').update({ name: name, point: newPoint }).eq('real_id', id);
+                if (error) throw error;
+                
+                showToast("정보 수정 완료", "success");
+                closeModal('editModal');
+                safeFetchData(true);
+            } catch (err) {
+                showToast("수정 실패", "error");
+            }
+        }
+
+        async function deleteSingle() {
+            if (!confirm("정말 이 유저를 영구 삭제하시겠습니까?")) return;
+            const id = document.getElementById('targetId').value;
+            
+            try {
+                const { error } = await supabase.from('users').delete().eq('real_id', id);
+                if (error) throw error;
+                showToast("삭제 완료");
+                closeModal('editModal');
+                safeFetchData(true);
+            } catch(err) {
+                showToast("삭제 실패", "error");
+            }
+        }
+
+        function addQ(val) {
+            const el = document.getElementById('editAmount');
+            const current = parseInt(el.value) || 0;
+            el.value = current + val;
+        }
+        function setZero() {
+            const id = document.getElementById('targetId').value;
+            const u = allUsers.find(x => x.real_id === id);
+            if(u) document.getElementById('editAmount').value = -(u.point);
+        }
+
+        function toggleUser(id) {
+            if (selectedIds.has(id)) selectedIds.delete(id);
+            else selectedIds.add(id);
+            renderTable(allUsers);
+        }
+        function toggleAll() {
+            const chk = document.getElementById('checkAll');
+            if (chk.checked) allUsers.forEach(u => selectedIds.add(u.real_id));
+            else selectedIds.clear();
+            renderTable(allUsers);
+        }
+        function updateBatchUI() {
+            const cnt = selectedIds.size;
+            document.getElementById('selectCount').innerText = cnt;
+            const grp = document.getElementById('batchGroup');
+            const lbl = document.getElementById('selectLabel');
+            
+            if (cnt > 0) {
+                grp.classList.add('active');
+                lbl.style.display = 'block';
+            } else {
+                grp.classList.remove('active');
+                lbl.style.display = 'none';
+            }
+        }
+
+        function batchAction(type) {
+            if (selectedIds.size === 0) return;
+            currentBatchType = type;
+            document.getElementById('batchCountNum').innerText = selectedIds.size;
+            
+            const title = document.getElementById('batchTitle');
+            const inputArea = document.getElementById('batchInputArea');
+            
+            if (type === 'bonus') {
+                title.innerText = "보너스 일괄 지급";
+                inputArea.style.display = 'block';
+            } else if (type === 'reset') {
+                title.innerText = "자산 일괄 압수 (0원)";
+                inputArea.style.display = 'none';
+            } else {
+                title.innerText = "유저 영구 삭제";
+                inputArea.style.display = 'none';
+            }
+            openModal('batchModal');
+        }
+
+        async function executeBatch() {
+            if (!supabase) return;
+            if (!confirm("선택한 유저들에게 작업을 수행하시겠습니까? 돌이킬 수 없습니다.")) return;
+
+            const amount = parseInt(document.getElementById('batchAmount').value) || 0;
+            const ids = Array.from(selectedIds);
+            
+            let successCnt = 0;
+            for (let id of ids) {
+                try {
+                    if (currentBatchType === 'bonus') {
+                        const u = allUsers.find(x => x.real_id === id);
+                        if (u) await supabase.from('users').update({ point: u.point + amount }).eq('real_id', id);
+                    } else if (currentBatchType === 'reset') {
+                        await supabase.from('users').update({ point: 0 }).eq('real_id', id);
+                    } else {
+                        await supabase.from('users').delete().eq('real_id', id);
+                    }
+                    successCnt++;
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+            
+            showToast(`${successCnt}명 작업 완료`);
+            closeModal('batchModal');
+            selectedIds.clear();
+            safeFetchData(true);
+        }
+
+        function openModal(id) { 
+            const m = document.getElementById(id); 
+            m.style.display = 'flex'; 
+            setTimeout(() => m.classList.add('open'), 10); 
+        }
+        function closeModal(id) { 
+            const m = document.getElementById(id); 
+            m.classList.remove('open'); 
+            setTimeout(() => m.style.display = 'none', 300); 
+        }
+        
+        function toggleAutoRefresh() {
+            const btn = document.getElementById('autoRefBtn');
+            btn.classList.toggle('toggle-active');
+            if (btn.classList.contains('toggle-active')) {
+                autoRefreshInterval = setInterval(() => safeFetchData(true), 5000);
+                showToast("자동 감시 시작");
+            } else {
+                clearInterval(autoRefreshInterval);
+                showToast("자동 감시 종료");
+            }
+        }
+
+        function filterData() {
+            const val = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allUsers.filter(u => 
+                (u.real_id && u.real_id.toLowerCase().includes(val)) || 
+                (u.name && u.name.toLowerCase().includes(val))
+            );
+            renderTable(filtered);
+        }
+
+        function copyId(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("ID 복사 완료");
+            });
+        }
+
+        function downloadCSV() {
+            if (allUsers.length === 0) { showToast("다운로드할 데이터가 없습니다.", "error"); return; }
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            csvContent += "ID,Name,Point,JoinDate\n";
+            
+            allUsers.forEach(u => {
+                csvContent += `${u.real_id},${u.name},${u.point},${u.created_at}\n`;
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "prime_users_backup.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function showToast(msg, type = 'info') {
+            const toast = document.getElementById('toast');
+            let icon = '<i class="fa-solid fa-circle-check" style="color:var(--success)"></i>';
+            if (type === 'error') icon = '<i class="fa-solid fa-triangle-exclamation" style="color:var(--danger)"></i>';
+            
+            toast.innerHTML = `${icon} ${msg}`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+    </script>
+</body>
+</html>
