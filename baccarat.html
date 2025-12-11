@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CAJGHN Baccarat</title>
+<title>CAJGHN Casino - Baccarat</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
     :root {
         --wood-dark: #4a3b30;
@@ -51,6 +52,12 @@
         letter-spacing: 2px; 
         font-family: inherit;
         text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+    h1:hover {
+        color: var(--accent-gold);
     }
 
     .game-container {
@@ -316,7 +323,7 @@
 <body>
 
     <header>
-        <h1>CAJGHN Baccarat</h1>
+        <h1 onclick="location.href='casino.html'">CAJGHN Baccarat</h1>
     </header>
 
     <div class="game-container">
@@ -339,7 +346,7 @@
 
         <div class="betting-board">
             <div class="info-panel">
-                <span>Balance: <span class="money-box"><span id="balance" class="money">10000</span></span></span>
+                <span>Balance: <span class="money-box"><span id="balance" class="money">...</span></span></span>
                 <span>Current Bet: <span class="money-box"><span id="currentBetDisplay" class="money">0</span></span></span>
             </div>
 
@@ -370,7 +377,12 @@
     </div>
 
 <script>
-    let balance = 10000;
+    const SUPABASE_URL = "https://nzdbalmwypdixduickzv.supabase.co"; 
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56ZGJhbG13eXBkaXhkdWlja3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNjc0MjgsImV4cCI6MjA4MDk0MzQyOH0.xskVDK0fIedVzC74bluatdhzXHY8ujKJVCQTiVcy824";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let balance = 0;
     let bets = { PLAYER: 0, TIE: 0, BANKER: 0 };
     
     let deck = [];
@@ -401,6 +413,32 @@
 
     const SUITS = ['♠', '♥', '♣', '♦'];
     const VALUES = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+    async function initGame() {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+            alert("Login required.");
+            window.location.href = "casino.html";
+            return;
+        }
+
+        currentUser = session.user;
+        await fetchBalance();
+    }
+
+    async function fetchBalance() {
+        const { data, error } = await supabase
+            .from('users')
+            .select('point')
+            .eq('id', currentUser.id)
+            .single();
+
+        if (data) {
+            balance = data.point;
+            updateUI();
+        }
+    }
 
     function createDeck() {
         deck = [];
@@ -492,7 +530,9 @@
             alert("Minimum bet is 100.");
             return;
         }
-        if (amount > balance) {
+
+        const currentTotalBet = bets.PLAYER + bets.TIE + bets.BANKER;
+        if (currentTotalBet + amount > balance) {
             alert("Insufficient balance.");
             return;
         }
@@ -506,16 +546,13 @@
             return;
         }
 
-        balance -= amount;
         bets[target] += amount;
-
         updateUI();
         updateBetButtonText(target);
     }
 
     function clearBets() {
         if (gameActive) return;
-        balance += bets.PLAYER + bets.TIE + bets.BANKER;
         bets = { PLAYER: 0, TIE: 0, BANKER: 0 };
         
         updateBetButtonText('PLAYER');
@@ -525,18 +562,36 @@
     }
 
     function updateUI() {
-        elBalance.textContent = Math.floor(balance);
-        const total = bets.PLAYER + bets.TIE + bets.BANKER;
-        elBetDisplay.textContent = total;
+        const totalBet = bets.PLAYER + bets.TIE + bets.BANKER;
+        elBalance.textContent = Math.floor(balance - totalBet); 
+        elBetDisplay.textContent = totalBet;
     }
 
-    function startDeal() {
+    async function startDeal() {
         const totalBet = bets.PLAYER + bets.TIE + bets.BANKER;
         if (totalBet === 0) {
             alert("Please place a bet first.");
             return;
         }
 
+        await fetchBalance();
+        if (totalBet > balance) {
+            alert("Insufficient balance.");
+            return;
+        }
+
+        const newBalance = balance - totalBet;
+        const { error } = await supabase
+            .from('users')
+            .update({ point: newBalance })
+            .eq('id', currentUser.id);
+
+        if (error) {
+            alert("Error: " + error.message);
+            return;
+        }
+
+        balance = newBalance;
         gameActive = true;
         
         btnDeal.disabled = true;
@@ -613,7 +668,7 @@
         finalizeGame();
     }
 
-    function finalizeGame() {
+    async function finalizeGame() {
         const pScore = calculateScore(playerHand);
         const bScore = calculateScore(bankerHand);
         
@@ -637,12 +692,26 @@
         }
 
         totalPayout = Math.floor(totalPayout);
-        if (totalPayout > 0) balance += totalPayout;
+        if (totalPayout > 0) {
+            const newBalance = balance + totalPayout;
+            await supabase
+                .from('users')
+                .update({ point: newBalance })
+                .eq('id', currentUser.id);
+            balance = newBalance;
+        }
 
+        bets = { PLAYER: 0, TIE: 0, BANKER: 0 };
         updateUI();
 
         if (totalPayout > totalBetAmount) {
             elWinTitle.textContent = "YOU WIN!";
+            elWinAmount.textContent = "+" + totalPayout;
+            setTimeout(() => {
+                winOverlay.classList.add('show');
+            }, 500);
+        } else if (totalPayout > 0 && totalPayout === totalBetAmount) {
+            elWinTitle.textContent = "PUSH";
             elWinAmount.textContent = "+" + totalPayout;
             setTimeout(() => {
                 winOverlay.classList.add('show');
@@ -682,6 +751,7 @@
     }
 
     createDeck();
+    initGame();
     
     btnDeal.addEventListener('click', startDeal);
     btnClear.addEventListener('click', clearBets);
