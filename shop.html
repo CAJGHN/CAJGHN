@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAJGHN PRIME SHOP</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    :root {
+        --bg-core: #0a0e17;
+        --bg-card: rgba(20, 27, 45, 0.95);
+        --accent: #e2b04a;
+        --accent-glow: rgba(226, 176, 74, 0.4);
+        --text: #eaeaea;
+        --text-sub: #94a3b8;
+        --danger: #ef4444;
+        --success: #10b981;
+        --border: rgba(226, 176, 74, 0.2);
+    }
+
+    * { box-sizing: border-box; outline: none; user-select: none; }
+    
+    body {
+        margin: 0;
+        background-color: var(--bg-core);
+        background-image: radial-gradient(circle at 50% 10%, #1e243d 0%, var(--bg-core) 90%);
+        color: var(--text);
+        font-family: 'Pretendard', sans-serif;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #login-section {
+        width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        background: var(--bg-core); z-index: 50;
+    }
+    .login-card {
+        background: var(--bg-card); padding: 50px 40px; border-radius: 20px;
+        border: 1px solid var(--border); width: 400px; text-align: center;
+        box-shadow: 0 0 50px rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+    }
+    .login-title { font-size: 2rem; color: var(--accent); margin-bottom: 30px; letter-spacing: 2px; font-weight: 800; text-shadow: 0 0 20px var(--accent-glow); }
+    
+    .input-field {
+        width: 100%; padding: 15px; margin-bottom: 10px;
+        background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+        color: white; border-radius: 10px; font-size: 1.1rem; text-align: center; transition: 0.3s;
+    }
+    .input-field:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+    
+    .action-btn {
+        width: 100%; padding: 15px; background: linear-gradient(135deg, var(--accent), #b48a3c);
+        color: #000; font-weight: 800; border: none; border-radius: 10px; cursor: pointer;
+        font-size: 1.1rem; transition: 0.3s; margin-top: 15px;
+    }
+    .action-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(226, 176, 74, 0.3); }
+
+    #shop-section {
+        width: 100%; height: 100%; display: none; flex-direction: column;
+        padding: 30px; max-width: 1200px; margin: 0 auto;
+    }
+
+    .shop-header {
+        display: flex; justify-content: space-between; align-items: center;
+        background: var(--bg-card); padding: 20px 30px; border-radius: 15px;
+        border: 1px solid var(--border); margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+    .user-info { display: flex; align-items: center; gap: 15px; }
+    .user-name { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+    .user-balance { 
+        font-size: 1.8rem; font-weight: 900; color: var(--accent); 
+        text-shadow: 0 0 15px var(--accent-glow); display: flex; align-items: center; gap: 10px;
+    }
+
+    .shop-grid {
+        display: flex; justify-content: center; gap: 30px;
+        align-items: center; flex: 1;
+    }
+
+    .item-card {
+        background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px;
+        padding: 40px 30px; text-align: center; transition: 0.3s; position: relative; overflow: hidden;
+        width: 300px; display: flex; flex-direction: column; justify-content: space-between;
+        height: 450px;
+    }
+    .item-card:hover { transform: translateY(-10px); border-color: var(--accent); box-shadow: 0 15px 40px var(--accent-glow); }
+    
+    .item-image-area { flex: 1; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; }
+    .item-icon { font-size: 6rem; color: var(--text); transition: 0.3s; filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); }
+    .item-card:hover .item-icon { transform: scale(1.2); }
+
+    .mychew .item-icon { color: #f472b6; } 
+    .banana .item-icon { color: #facc15; } 
+    .choco .item-icon { color: #8d6e63; } 
+
+    .item-info h3 { font-size: 1.5rem; margin: 0 0 10px 0; color: white; }
+    .item-price { font-size: 1.4rem; color: var(--accent); font-weight: 800; margin-bottom: 20px; letter-spacing: 0.5px; }
+    
+    .buy-btn {
+        width: 100%; padding: 15px; background: rgba(255,255,255,0.05);
+        border: 1px solid var(--border); color: var(--accent); font-weight: 700;
+        border-radius: 12px; cursor: pointer; transition: 0.2s; font-size: 1.1rem;
+    }
+    .buy-btn:hover { background: var(--accent); color: black; }
+    .buy-btn:active { transform: scale(0.95); }
+
+    .receipt-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center;
+        z-index: 200; opacity: 0; transition: 0.3s;
+    }
+    .receipt-overlay.open { opacity: 1; }
+    
+    .receipt-paper {
+        background: #fff; width: 380px; padding: 40px 30px; border-radius: 5px;
+        position: relative; box-shadow: 0 0 50px rgba(255,255,255,0.2);
+        color: #000; font-family: 'Courier New', monospace;
+        transform: translateY(20px); transition: 0.4s;
+        text-align: center;
+    }
+    .receipt-overlay.open .receipt-paper { transform: translateY(0); }
+
+    .receipt-paper::before, .receipt-paper::after {
+        content: ''; position: absolute; left: 0; width: 100%; height: 10px;
+        background: radial-gradient(circle, transparent 70%, #fff 70%) repeat-x;
+        background-size: 20px 20px;
+    }
+    .receipt-paper::before { top: -10px; background-position: -10px 10px; transform: rotate(180deg); }
+    .receipt-paper::after { bottom: -10px; background-position: -10px 10px; }
+
+    .rcp-header { border-bottom: 2px dashed #000; padding-bottom: 15px; margin-bottom: 15px; font-weight: bold; font-size: 1.5rem; }
+    .rcp-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 1.1rem; font-weight: bold; }
+    .rcp-divider { border-bottom: 2px dashed #000; margin: 20px 0; }
+    .rcp-barcode { font-size: 5rem; transform: scaleX(1.5); margin: 20px 0; }
+    .rcp-msg { font-size: 1.2rem; font-weight: 900; color: #ff0000; margin-top: 10px; border: 3px solid #ff0000; padding: 10px; display: inline-block; transform: rotate(-5deg); }
+    .rcp-time { color: #555; font-size: 0.8rem; margin-bottom: 5px; }
+
+    .close-rcp-btn {
+        margin-top: 25px; width: 100%; padding: 15px; background: #000; color: #fff;
+        border: none; font-weight: bold; font-size: 1.1rem; cursor: pointer; border-radius: 5px;
+    }
+
+    #toast {
+        position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px);
+        background: #1e293b; border: 1px solid var(--accent); color: var(--accent);
+        padding: 15px 30px; border-radius: 50px; font-weight: bold; opacity: 0; transition: 0.4s;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+    <div id="login-section">
+        <div class="login-card">
+            <i class="fa-solid fa-store" style="font-size:3rem; color:var(--accent); margin-bottom:20px;"></i>
+            <div class="login-title">PRIME SHOP</div>
+            
+            <input type="text" id="userIdInput" class="input-field" placeholder="본인 ID 입력" autocomplete="off">
+            <button class="action-btn" onclick="login()">상점 입장</button>
+            <div id="loginMsg" style="color:var(--danger); margin-top:15px; min-height:20px; font-weight:bold;"></div>
+        </div>
+    </div>
+
+    <div id="shop-section">
+        <div class="shop-header">
+            <div class="user-info">
+                <i class="fa-solid fa-circle-user" style="font-size:2.5rem; color:var(--text-sub);"></i>
+                <div>
+                    <div style="font-size:0.8rem; color:var(--text-sub);">접속자</div>
+                    <div class="user-name" id="displayId">User</div>
+                </div>
+            </div>
+            <div class="user-balance">
+                <i class="fa-solid fa-won-sign"></i>
+                <span id="displayPoint">0</span>
+            </div>
+        </div>
+
+        <div class="shop-grid">
+            
+            <div class="item-card mychew">
+                <div class="item-image-area">
+                    <i class="fa-solid fa-candy-cane item-icon"></i>
+                </div>
+                <div class="item-info">
+                    <h3>마이쮸</h3>
+                    <div class="item-price">80,000,000</div>
+                    <button class="buy-btn" onclick="buyItem(80000000, '마이쮸')">구매하기</button>
+                </div>
+            </div>
+
+            <div class="item-card choco">
+                <div class="item-image-area">
+                    <i class="fa-solid fa-mug-hot item-icon"></i>
+                </div>
+                <div class="item-info">
+                    <h3>초코우유</h3>
+                    <div class="item-price">140,000,000</div>
+                    <button class="buy-btn" onclick="buyItem(140000000, '초코우유')">구매하기</button>
+                </div>
+            </div>
+
+            <div class="item-card banana">
+                <div class="item-image-area">
+                    <i class="fa-solid fa-bottle-droplet item-icon"></i>
+                </div>
+                <div class="item-info">
+                    <h3>바나나우유</h3>
+                    <div class="item-price">180,000,000</div>
+                    <button class="buy-btn" onclick="buyItem(180000000, '바나나우유')">구매하기</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="receipt-overlay" id="receiptModal">
+        <div class="receipt-paper">
+            <div class="rcp-header">PRIME RECEIPT</div>
+            
+            <div class="rcp-time" id="rcpDate">2023-00-00 00:00:00</div>
+            <div class="rcp-time" style="margin-bottom:20px;">OID: <span id="rcpOrderId"></span></div>
+
+            <div class="rcp-row">
+                <span>ITEM</span>
+                <span id="rcpItemName">ITEM NAME</span>
+            </div>
+            <div class="rcp-row">
+                <span>PRICE</span>
+                <span id="rcpPrice">0</span>
+            </div>
+            
+            <div class="rcp-divider"></div>
+            <div class="rcp-row" style="font-size:1.3rem;">
+                <span>TOTAL</span>
+                <span id="rcpTotal">0</span>
+            </div>
+
+            <div class="rcp-barcode">
+                <i class="fa-solid fa-barcode"></i>
+            </div>
+
+            <div class="rcp-msg">
+                캡쳐해서 보여주세요!
+            </div>
+
+            <button class="close-rcp-btn" onclick="closeReceipt()">확인 (닫기)</button>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        const SUPABASE_URL = "https://nzdbalmwypdixduickzv.supabase.co"; 
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56ZGJhbG13eXBkaXhkdWlja3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNjc0MjgsImV4cCI6MjA4MDk0MzQyOH0.xskVDK0fIedVzC74bluatdhzXHY8ujKJVCQTiVcy824";
+        let supabase = null;
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if(window.supabase) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            document.getElementById('userIdInput').addEventListener('keyup', (e)=>{ if(e.key==='Enter') login(); });
+        });
+
+        async function login() {
+            const id = document.getElementById('userIdInput').value.trim();
+            const msg = document.getElementById('loginMsg');
+            
+            if(!id) {
+                msg.innerText = "ID를 입력해주세요.";
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('real_id', id)
+                    .single();
+
+                if(error || !data) {
+                    msg.innerText = "존재하지 않는 ID입니다.";
+                    return;
+                }
+                
+                currentUser = data;
+                enterShop();
+            } catch(e) {
+                console.error(e);
+                msg.innerText = "로그인 시스템 오류";
+            }
+        }
+
+        function enterShop() {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('shop-section').style.display = 'flex';
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('displayId').innerText = `${currentUser.name}`;
+            document.getElementById('displayPoint').innerText = currentUser.point.toLocaleString() + " 원";
+        }
+
+        async function buyItem(price, itemName) {
+            if(currentUser.point < price) {
+                showToast("잔액이 부족합니다! 돈 더 벌어오세요.", "error");
+                return;
+            }
+
+            if(!confirm(`[${itemName}] 구매하시겠습니까?\n가격: ${price.toLocaleString()}원`)) return;
+
+            const newPoint = currentUser.point - price;
+
+            try {
+                const { error } = await supabase.from('users').update({ point: newPoint }).eq('real_id', currentUser.real_id);
+                if(error) throw error;
+
+                currentUser.point = newPoint;
+                updateUI();
+                
+                showReceipt(itemName, price);
+
+            } catch(e) {
+                showToast("구매 처리 중 오류 발생", "error");
+            }
+        }
+
+        function showReceipt(name, price) {
+            const now = new Date();
+            const orderId = Math.random().toString(36).substr(2, 9).toUpperCase();
+
+            document.getElementById('rcpDate').innerText = now.toLocaleString();
+            document.getElementById('rcpOrderId').innerText = orderId;
+            document.getElementById('rcpItemName').innerText = name;
+            document.getElementById('rcpPrice').innerText = price.toLocaleString();
+            document.getElementById('rcpTotal').innerText = price.toLocaleString();
+
+            const modal = document.getElementById('receiptModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('open'), 10);
+        }
+
+        function closeReceipt() {
+            const modal = document.getElementById('receiptModal');
+            modal.classList.remove('open');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+
+        function showToast(msg, type='success') {
+            const t = document.getElementById('toast');
+            t.style.borderColor = type === 'error' ? 'var(--danger)' : 'var(--accent)';
+            t.style.color = type === 'error' ? 'var(--danger)' : 'var(--accent)';
+            t.innerHTML = type === 'error' ? `<i class="fa-solid fa-triangle-exclamation"></i> ${msg}` : `<i class="fa-solid fa-receipt"></i> ${msg}`;
+            t.classList.add('show');
+            setTimeout(()=>t.classList.remove('show'), 2500);
+        }
+    </script>
+</body>
+</html>
