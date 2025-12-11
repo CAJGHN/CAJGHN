@@ -196,6 +196,17 @@
         const btnRight = document.getElementById('btn-right');
         const userInfoText = document.getElementById('user-info-text');
 
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (session) {
+                currentUser = session.user;
+                updateHeaderUI(true);
+                fetchUserPoint();
+            } else {
+                currentUser = null;
+                updateHeaderUI(false);
+            }
+        });
+
         function moveGame(url) {
             if (!currentUser) {
                 alert("로그인 후 이용 가능합니다.");
@@ -221,17 +232,6 @@
             }
         }
 
-        window.onload = async function() {
-            const { data } = await supabase.auth.getSession();
-            if (data.session) {
-                currentUser = data.session.user;
-                updateHeaderUI(true);
-                fetchUserPoint();
-            } else {
-                updateHeaderUI(false);
-            }
-        };
-
         function updateHeaderUI(isLoggedIn) {
             if (isLoggedIn) {
                 userInfoText.style.display = "flex"; 
@@ -241,6 +241,8 @@
                 userInfoText.style.display = "none";
                 btnLeft.innerText = "로그인";
                 btnRight.innerText = "회원가입";
+                document.getElementById('user-name').innerText = "-";
+                document.getElementById('user-point').innerText = "0";
             }
         }
 
@@ -300,11 +302,7 @@
             });
 
             if (error) return alert("정보가 틀렸습니다.");
-
-            currentUser = data.user;
             closeModal();
-            updateHeaderUI(true);
-            fetchUserPoint();
         }
 
         async function fetchUserPoint() {
@@ -318,7 +316,6 @@
 
         async function logout() {
             await supabase.auth.signOut();
-            location.reload();
         }
     </script>
 </body>
