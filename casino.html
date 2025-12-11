@@ -320,6 +320,8 @@
 
         async function logout() {
             await supabase.auth.signOut();
+            alert("로그아웃 되었습니다.");
+            location.reload(); 
         }
     </script>
 </body>
