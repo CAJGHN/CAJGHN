@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>부흥 카지노 - PUHUNG CASINO</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Gungsuh&family=Nanum+Myeongjo:wght@700;800&family=Noto+Sans+KR:wght@500;900&display=swap');
+
+        :root {
+            --bg-black: #050505;
+            --gold-lux: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            --gold-dark: linear-gradient(to bottom, #cfc09f 20%, #634f2c 30%, #cfc09f 40%, #634f2c 50%, #3a2c0f 100%);
+            --royal-red: linear-gradient(to bottom, #ff0000, #990000);
+        }
+
+        body {
+            background-color: var(--bg-black);
+            background-image: radial-gradient(#222 15%, transparent 16%);
+            background-size: 8px 8px;
+            color: #ddd;
+            font-family: 'Noto Sans KR', sans-serif;
+            margin: 0; padding: 0;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #b38728; border: 1px solid #fff; }
+
+        .gold-text {
+            background: var(--gold-lux);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            font-family: 'Gungsuh', serif;
+            font-weight: 800;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.8);
+        }
+
+        .flash-border { border: 2px solid #b38728; animation: borderPulse 1.5s infinite; }
+        @keyframes borderPulse {
+            0% { border-color: #b38728; box-shadow: 0 0 5px #b38728; }
+            50% { border-color: #ffecb3; box-shadow: 0 0 20px #ffecb3; }
+            100% { border-color: #b38728; box-shadow: 0 0 5px #b38728; }
+        }
+
+        .blink { animation: blinker 0.5s linear infinite alternate; }
+        @keyframes blinker { from { opacity: 1; color: yellow; } to { opacity: 0.5; color: red; } }
+
+        .marquee-bar {
+            background: #000;
+            border-bottom: 2px solid #b38728;
+            color: #fff;
+            font-family: 'Dotum', sans-serif;
+            font-size: 14px;
+            padding: 8px 0;
+            position: relative; z-index: 9000;
+        }
+        .marquee-bar span { color: #ffff00; font-weight: bold; margin: 0 15px; }
+
+        .header {
+            background: linear-gradient(180deg, #1a1a1a, #000);
+            padding: 20px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .logo-area { text-align: center; cursor: pointer; }
+        .logo { font-size: 40px; letter-spacing: -2px; font-family: 'Gungsuh', serif; font-weight: bold; }
+        .sub-logo { font-size: 14px; color: #888; letter-spacing: 5px; text-transform: uppercase; font-weight: bold; margin-top: 5px; }
+
+        .pc-nav {
+            background: #080808;
+            border-bottom: 2px solid #b38728;
+            display: flex; justify-content: center;
+            height: 55px;
+        }
+        .pc-menu-item {
+            width: 140px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 16px; font-weight: bold; color: #ccc;
+            cursor: pointer; border-right: 1px solid #222;
+            transition: 0.3s;
+            font-family: 'Nanum Myeongjo', serif;
+        }
+        .pc-menu-item:first-child { border-left: 1px solid #222; }
+        .pc-menu-item:hover { background: #1a1a1a; color: #ffd700; text-shadow: 0 0 5px gold; }
+
+        .btn-gold {
+            background: var(--gold-dark);
+            border: 1px solid #ffecb3;
+            color: #fff; font-weight: bold;
+            padding: 8px 20px; cursor: pointer;
+            box-shadow: 0 0 5px rgba(179, 135, 40, 0.5);
+        }
+
+        .popup-container-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 20px;
+            position: relative;
+            z-index: 5000;
+            margin-bottom: 20px;
+        }
+
+        .popup {
+            flex: 1;
+            background: #0f0f0f;
+            display: flex; flex-direction: column;
+            box-shadow: 0 10px 50px rgba(0,0,0,1);
+            border: 2px solid #b38728;
+            min-height: 350px; 
+        }
+        
+        .popup-head {
+            background: var(--gold-dark);
+            padding: 10px; color: white;
+            font-weight: bold;
+            font-family: 'Nanum Myeongjo', serif;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 16px;
+            border-bottom: 1px solid #fff;
+        }
+
+        .popup-body {
+            flex: 1; padding: 15px; text-align: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: radial-gradient(circle, #222 0%, #000 100%);
+            line-height: 1.6;
+        }
+
+        .popup-title {
+            font-size: 22px; font-weight: 900; color: #ffecb3; 
+            margin-bottom: 10px; font-family: 'Nanum Myeongjo', serif;
+            text-decoration: underline; text-decoration-color: #b38728;
+            text-underline-offset: 5px;
+        }
+        
+        .popup-foot { background: #000; padding: 10px; text-align: center; border-top: 1px solid #333; }
+        .close-btn { background: #333; color: #fff; border: 1px solid #555; padding: 5px 20px; cursor: pointer; font-size: 14px; font-weight: bold; }
+
+        .wing-banner {
+            position: fixed; top: 250px; width: 150px;
+            z-index: 4000; display: flex; flex-direction: column; gap: 15px;
+        }
+        .left-wing { left: 30px; }
+        .right-wing { right: 30px; }
+        
+        .wing-box {
+            background: #000; border: 2px solid #b38728;
+            padding: 15px 5px; text-align: center;
+            box-shadow: 0 0 20px rgba(0,0,0,0.9);
+            cursor: pointer;
+        }
+        .wing-box:hover { transform: scale(1.05); border-color: #fff; }
+        .wing-title { color: #ffd700; font-weight: bold; font-size: 18px; margin-bottom: 5px; font-family: 'Nanum Myeongjo', serif; }
+        .wing-text { color: #fff; font-size: 13px; line-height: 1.4; }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px 100px 20px; }
+
+        .hero-section {
+            height: 320px;
+            background: radial-gradient(circle, #550000 0%, #000000 80%);
+            border: 4px double #b38728;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            margin-bottom: 30px; position: relative;
+        }
+        .hero-text { font-size: 60px; text-shadow: 0 5px 10px black; animation: zoomer 2s infinite alternate; }
+        @keyframes zoomer { from { transform: scale(1); } to { transform: scale(1.02); } }
+
+        .section-header {
+            display: flex; align-items: center; gap: 15px; margin: 50px 0 20px 0;
+            border-bottom: 1px solid #333; padding-bottom: 10px;
+        }
+        .section-title { font-size: 26px; color: #b38728; font-weight: bold; font-family: 'Nanum Myeongjo', serif; }
+        .bar { height: 2px; flex: 1; background: linear-gradient(90deg, #b38728, transparent); }
+
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;
+        }
+        .card {
+            background: linear-gradient(180deg, #1a1a1a, #000);
+            border: 1px solid #333; height: 180px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            cursor: pointer; position: relative; transition: 0.3s;
+        }
+        .card:hover { border-color: #ffd700; transform: translateY(-5px); box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+        .card-icon { font-size: 60px; margin-bottom: 15px; text-shadow: 0 5px 5px black; }
+        .card-name { font-size: 18px; font-weight: bold; color: #ccc; font-family: 'Nanum Myeongjo', serif; }
+
+        .mobile-nav {
+            display: none;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 70px;
+            background: #080808; border-top: 2px solid #b38728;
+            justify-content: space-around; align-items: center; z-index: 8000;
+        }
+        .m-nav-item { color: #888; font-size: 11px; text-align: center; cursor: pointer; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .m-nav-item i { font-size: 22px; margin-bottom: 5px; }
+        .m-nav-item span { font-weight: bold; }
+        .m-home-btn {
+            width: 70px; height: 70px; background: var(--gold-lux);
+            border-radius: 50%; border: 4px solid #000;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 28px; color: #000; margin-top: -35px;
+            box-shadow: 0 -5px 20px rgba(179, 135, 40, 0.5);
+            cursor: pointer;
+        }
+
+        .modal-wrap {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 9000;
+            justify-content: center; align-items: center;
+        }
+        .modal {
+            background: #000; border: 2px solid #b38728;
+            width: 350px; padding: 30px; text-align: center;
+            box-shadow: 0 0 50px rgba(179, 135, 40, 0.4);
+        }
+        .inp {
+            width: 100%; padding: 15px; margin: 8px 0;
+            background: #111; border: 1px solid #333; color: white; box-sizing: border-box; font-size: 16px;
+        }
+        .action-btn { width: 100%; padding: 15px; margin-top: 15px; font-weight: bold; font-size: 18px; }
+
+        @media (max-width: 1024px) {
+            .popup-container-row {
+                display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: transparent; padding: 0; margin: 0; z-index: 9999;
+                pointer-events: none; 
+            }
+            .popup {
+                width: 85%; position: absolute; top: 50%; left: 50%; 
+                transform: translate(-50%, -50%);
+                pointer-events: auto; 
+                margin-bottom: 0;
+            }
+            #pop4 { z-index: 10004; }
+            #pop3 { z-index: 10003; }
+            #pop2 { z-index: 10002; }
+            #pop1 { z-index: 10001; }
+
+            .wing-banner { display: none; }
+            .pc-nav { display: none; }
+            .mobile-nav { display: flex; }
+            .hero-section { height: 200px; }
+            .hero-text { font-size: 30px; }
+            .header { padding: 15px; flex-direction: column; gap: 10px; }
+            .grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marquee-bar">
+        <marquee scrollamount="12">
+            <span>🚨 [필독] 계좌변경 안내</span> 입금 계좌가 수시로 변경되오니 반드시 고객센터 문의 후 입금 바랍니다. (기존계좌 입금시 전액몰수)
+            <span>💎 부흥 카지노 10주년</span> 신규 40% 매충 15% 페이백 10% 지인추천 20만 지급
+            <span>👑 ROYAL CLASS</span> 마틴/루틴/찍어먹기 제재 X / 단폴더 가능 / 고액 전용 안심놀이터
+            <span>🚫 사칭주의</span> 텔레그램 아이디 @BUHEUNG 외에는 모두 사칭입니다.
+        </marquee>
+    </div>
+
+    <div class="header">
+        <div class="logo-area" onclick="location.reload()">
+            <div class="logo gold-text">부흥</div>
+            <div class="sub-logo">PUHUNG CASINO</div>
+        </div>
+        <div id="auth-box">
+        </div>
+    </div>
+
+    <div class="pc-nav">
+        <div class="pc-menu-item" onclick="move('baccarat.html')">라이브카지노</div>
+        <div class="pc-menu-item" onclick="move('slot.html')">슬롯머신</div>
+        <div class="pc-menu-item" onclick="move('minigames.html')">미니게임</div>
+        <div class="pc-menu-item" onclick="move('holdem.html')">홀덤/포커</div>
+        <div class="pc-menu-item" onclick="alert('충전페이지')">충전신청</div>
+        <div class="pc-menu-item" onclick="alert('환전페이지')">환전신청</div>
+        <div class="pc-menu-item" onclick="alert('고객센터')">고객센터</div>
+    </div>
+
+    <div class="wing-banner left-wing">
+        <div class="wing-box">
+            <div style="font-size:30px;">🏛️</div>
+            <div class="wing-title">SINCE 2010</div>
+            <div class="wing-text">무사고 15년<br>메이저 공원<br>부흥 카지노</div>
+        </div>
+        <div class="wing-box">
+            <div style="font-size:30px;">🛡️</div>
+            <div class="wing-title">SECURITY</div>
+            <div class="wing-text">철벽 보안<br>졸업 O 먹튀 X<br>100억 예치</div>
+        </div>
+    </div>
+
+    <div class="wing-banner right-wing">
+        <div class="wing-box">
+            <div style="font-size:30px;">💰</div>
+            <div class="wing-title">EXCHANGE</div>
+            <div class="wing-text">LTE 충환전<br>1회 1억 가능<br>환전제한 X</div>
+        </div>
+        <div class="wing-box">
+            <div style="font-size:30px;">📞</div>
+            <div class="wing-title">TELEGRAM</div>
+            <div class="wing-text">24시간 문의<br>@BUHEUNG<br>사칭 주의</div>
+        </div>
+    </div>
+
+    <div class="popup-container-row">
+        
+        <div id="pop1" class="popup flash-border" style="border-color:#555;">
+            <div class="popup-head"><span>규정 안내</span><span class="close-btn" onclick="closePopup('pop1')">X</span></div>
+            <div class="popup-body">
+                <div style="font-size:40px;">📋</div>
+                <div class="popup-title">배팅 규정 안내</div>
+                <p style="color:#ccc;">마틴 / 루틴 / 찍어먹기 <strong>제재 없음</strong><br>시스템 배팅 가능<br>양방 배팅은 강력 제재 대상입니다.</p>
+                <div style="background:#222; color:white; width:100%; padding:5px; margin-top:5px;">단폴더 / 두폴더 모두 가능</div>
+            </div>
+            <div class="popup-foot"><button class="close-btn" onclick="closePopup('pop1')">닫기</button></div>
+        </div>
+
+        <div id="pop2" class="popup flash-border" style="border-color:cyan;">
+            <div class="popup-head" style="background:#003333;"><span>고객센터</span><span class="close-btn" onclick="closePopup('pop2')">X</span></div>
+            <div class="popup-body">
+                <div style="font-size:40px;">🛡️</div>
+                <div class="popup-title" style="color:cyan;">텔레그램 @BUHEUNG</div>
+                <p style="color:#ccc;">24시간 연중무휴 고객센터<br>사칭 사기 주의바랍니다.</p>
+                <div style="border:1px dashed cyan; color:cyan; padding:5px; width:100%;">충전/환전 지연시 보상금 지급</div>
+            </div>
+            <div class="popup-foot"><button class="close-btn" onclick="closePopup('pop2')">닫기</button></div>
+        </div>
+
+        <div id="pop3" class="popup flash-border" style="border-color:#fff;">
+            <div class="popup-head" style="background:#333;"><span>이벤트 안내</span><span class="close-btn" onclick="closePopup('pop3')">X</span></div>
+            <div class="popup-body">
+                <div style="font-size:40px;">💎</div>
+                <div class="popup-title gold-text">파격 이벤트</div>
+                <p style="color:#00ffff; font-weight:bold; font-size:16px;">가입 첫충 40%<br>무한 매충 15%</p>
+                <p class="blink" style="color:red; font-weight:bold;">환전 내역 있어도 지급!</p>
+                <div style="font-size:12px; color:#aaa;">3+2 5+3 10+5 20+8 30+10</div>
+            </div>
+            <div class="popup-foot"><button class="close-btn" onclick="closePopup('pop3')">닫기</button></div>
+        </div>
+
+        <div id="pop4" class="popup flash-border" style="border-color:red;">
+            <div class="popup-head" style="background:#550000;"><span>긴급 공지</span><span class="close-btn" onclick="closePopup('pop4')">X</span></div>
+            <div class="popup-body">
+                <div style="font-size:40px;">🏦</div>
+                <div class="popup-title" style="color:#ff4444;">계좌 변경 안내</div>
+                <p style="font-size:14px; line-height:1.6;">보안강화를 위해 계좌가 변경되었습니다.<br>기존 계좌 입금시 <strong style="color:red; text-decoration:underline;">전액 몰수 처리</strong> 됩니다.</p>
+                <div style="background:red; color:white; font-weight:bold; padding:5px 10px; margin-top:5px;">반드시 고객센터 문의 후 입금</div>
+            </div>
+            <div class="popup-foot"><button class="close-btn" onclick="closePopup('pop4')">닫기</button></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="hero-section">
+            <div style="color:#ffd700; border:2px solid #ffd700; padding:5px 20px; font-weight:bold; margin-bottom:10px;">VVIP PRIVATE LOUNGE</div>
+            <div class="gold-text hero-text">부 흥</div>
+            <div style="color:#bbb; letter-spacing:4px; margin-top:10px;">BUHEUNG ROYAL CASINO</div>
+            <div style="margin-top:20px; color:#b38728;">★ 자본금 1위 / 먹튀이력 ZERO / 안전보장 ★</div>
+        </div>
+
+        <div class="section-header">
+            <div class="section-title">라이브 카지노</div>
+            <div class="bar"></div>
+        </div>
+        <div class="grid">
+            <div class="card" onclick="move('baccarat.html')">
+                <div style="position:absolute; top:10px; left:10px; background:red; color:white; font-size:11px; padding:2px 8px;">HOT</div>
+                <div class="card-icon">♠️</div>
+                <div class="card-name">바카라</div>
+            </div>
+            <div class="card" onclick="move('blackjack.html')">
+                <div class="card-icon">♣️</div>
+                <div class="card-name">블랙잭</div>
+            </div>
+            <div class="card" onclick="move('roulette.html')">
+                <div style="position:absolute; top:10px; left:10px; background:blue; color:white; font-size:11px; padding:2px 8px;">LIVE</div>
+                <div class="card-icon">🎡</div>
+                <div class="card-name">룰렛</div>
+            </div>
+            <div class="card" onclick="move('sicbo.html')">
+                <div class="card-icon">🎲</div>
+                <div class="card-name">식보</div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <div class="section-title">슬롯 & 미니게임</div>
+            <div class="bar"></div>
+        </div>
+        <div class="grid">
+            <div class="card" onclick="move('slot.html')">
+                <div style="position:absolute; top:10px; left:10px; background:gold; color:black; font-size:11px; padding:2px 8px; font-weight:bold;">JACKPOT</div>
+                <div class="card-icon">🎰</div>
+                <div class="card-name">슬롯머신</div>
+            </div>
+            <div class="card" onclick="move('powerball.html')">
+                <div class="card-icon">🎱</div>
+                <div class="card-name">파워볼</div>
+            </div>
+            <div class="card" onclick="move('ladder.html')">
+                <div class="card-icon">🪜</div>
+                <div class="card-name">사다리</div>
+            </div>
+            <div class="card" onclick="move('holdem.html')">
+                <div class="card-icon">🃏</div>
+                <div class="card-name">홀덤</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-nav">
+        <div class="m-nav-item" onclick="alert('충전')">
+            <i class="fa-solid fa-sack-dollar"></i><span>충전</span>
+        </div>
+        <div class="m-nav-item" onclick="alert('환전')">
+            <i class="fa-solid fa-money-bill-transfer"></i><span>환전</span>
+        </div>
+        <div class="m-nav-item" style="overflow:visible;">
+            <div class="m-home-btn" onclick="location.reload()">
+                <i class="fa-solid fa-house"></i>
+            </div>
+        </div>
+        <div class="m-nav-item" onclick="alert('문의')">
+            <i class="fa-solid fa-phone"></i><span>문의</span>
+        </div>
+        <div class="m-nav-item" onclick="alert('정보')">
+            <i class="fa-solid fa-user"></i><span>정보</span>
+        </div>
+    </div>
+
+    <div id="login-modal" class="modal-wrap">
+        <div class="modal">
+            <h2 class="gold-text">MEMBER LOGIN</h2>
+            <input type="text" id="lid" class="inp" placeholder="아이디">
+            <input type="password" id="lpw" class="inp" placeholder="비밀번호">
+            <button class="btn-gold action-btn" onclick="doLogin()">로그인</button>
+            <button class="action-btn" style="background:#333; color:white; border:none;" onclick="closeModal()">닫기</button>
+        </div>
+    </div>
+
+    <div id="join-modal" class="modal-wrap">
+        <div class="modal">
+            <h2 class="gold-text">JOIN MEMBER</h2>
+            <input type="text" id="jid" class="inp" placeholder="아이디">
+            <input type="password" id="jpw" class="inp" placeholder="비밀번호">
+            <input type="text" id="jnm" class="inp" placeholder="닉네임 (예금주)">
+            <input type="text" class="inp" value="코드 : ROYAL" disabled style="background:#222; color:#888;">
+            <button class="btn-gold action-btn" style="border-color:red;" onclick="doJoin()">가입신청</button>
+            <button class="action-btn" style="background:#333; color:white; border:none;" onclick="closeModal()">닫기</button>
+        </div>
+    </div>
+
+    <script>
+        const SB_URL = "https://nzdbalmwypdixduickzv.supabase.co"; 
+        const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56ZGJhbG13eXBkaXhkdWlja3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNjc0MjgsImV4cCI6MjA4MDk0MzQyOH0.xskVDK0fIedVzC74bluatdhzXHY8ujKJVCQTiVcy824";
+        const sb = window.supabase.createClient(SB_URL, SB_KEY);
+        let curUser = null;
+
+        function closePopup(id) { document.getElementById(id).style.display='none'; }
+        function openModal(id) { document.querySelectorAll('.modal-wrap').forEach(e=>e.style.display='none'); document.getElementById(id).style.display='flex'; }
+        function closeModal() { document.querySelectorAll('.modal-wrap').forEach(e=>e.style.display='none'); }
+        function move(url) { if(!curUser){ alert('로그인 후 이용 가능합니다.'); openModal('login-modal'); return; } location.href=url; }
+
+        sb.auth.onAuthStateChange((e,s) => {
+            if(s) { curUser=s.user; setUI(true); getPt(); } else { curUser=null; setUI(false); }
+        });
+
+        function setUI(isLog) {
+            const area = document.getElementById('auth-box');
+            if(isLog) {
+                area.innerHTML = `
+                    <div style="text-align:right; font-size:12px;">
+                        <span class="gold-text">VIP <span id="unm"></span></span>님
+                        <div style="color:#00ffff; font-weight:bold;">₩ <span id="upt">0</span></div>
+                    </div>
+                    <button onclick="logout()" style="margin-left:10px; background:#333; color:white; border:none; padding:5px 10px; font-weight:bold;">OUT</button>
+                `;
+            } else {
+                area.innerHTML = `
+                    <button class="btn-gold" onclick="openModal('login-modal')">로그인</button>
+                    <button class="btn-gold" style="background:linear-gradient(to bottom, #990000, #550000); border-color:#ff5555;" onclick="openModal('join-modal')">회원가입</button>
+                `;
+            }
+        }
+
+        async function doLogin() {
+            const i=document.getElementById('lid').value; const p=document.getElementById('lpw').value;
+            const {error}=await sb.auth.signInWithPassword({email:i+"@game.com", password:p});
+            if(error) alert('정보 불일치'); else closeModal();
+        }
+        async function doJoin() {
+            const i=document.getElementById('jid').value; const p=document.getElementById('jpw').value; const n=document.getElementById('jnm').value;
+            if(p.length<6) return alert('비번 6자 이상');
+            const {error}=await sb.auth.signUp({email:i+"@game.com", password:p, options:{data:{real_id:i, name:n}}});
+            if(error) alert('가입 실패'); else { await sb.auth.signOut(); alert('신청 완료'); closeModal(); }
+        }
+        async function getPt() {
+            if(!curUser) return;
+            const {data}=await sb.from('users').select('*').eq('id', curUser.id).single();
+            if(data){ document.getElementById('unm').innerText=data.name; document.getElementById('upt').innerText=data.point.toLocaleString(); }
+        }
+        async function logout() { await sb.auth.signOut(); location.reload(); }
+    </script>
+</body>
+</html>
