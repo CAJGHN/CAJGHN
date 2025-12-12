@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CAJGHN OPS</title>
+<title>관리 페이지</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -20,6 +20,7 @@
         --vvip: #d8b4fe;
         --vip: #60a5fa;
         --high: #2dd4bf;
+        --admin: #f43f5e;
     }
 
     * { box-sizing: border-box; outline: none; user-select: none; }
@@ -51,7 +52,7 @@
         width: 100%; padding: 15px; margin-bottom: 15px;
         background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border);
         color: var(--accent); border-radius: 10px; font-size: 1.2rem;
-        text-align: center; letter-spacing: 4px; transition: 0.3s;
+        text-align: center; letter-spacing: 2px; transition: 0.3s;
         font-weight: bold;
     }
     .login-input::placeholder { color: rgba(226, 176, 74, 0.3); letter-spacing: 0px; font-weight: normal; font-size: 0.95rem; }
@@ -171,6 +172,7 @@
     .badge-vvip { background: rgba(216, 180, 254, 0.1); color: var(--vvip); border-color: var(--vvip); box-shadow: 0 0 10px rgba(216, 180, 254, 0.2); }
     .badge-vip { background: rgba(96, 165, 250, 0.1); color: var(--vip); border-color: var(--vip); }
     .badge-high { background: rgba(45, 212, 191, 0.1); color: var(--high); border-color: var(--high); }
+    .badge-admin { background: rgba(244, 63, 94, 0.15); color: var(--admin); border-color: var(--admin); box-shadow: 0 0 10px rgba(244, 63, 94, 0.3); }
 
     .id-copy { cursor: copy; font-family: 'Courier New', monospace; opacity: 0.7; transition: 0.2s; }
     .id-copy:hover { color: var(--accent); opacity: 1; text-decoration: underline; }
@@ -220,14 +222,12 @@
 <body>
 
     <div id="login-screen">
-        <h1 style="color:var(--accent); font-size:2.4rem; margin-bottom:40px; letter-spacing:2px; text-shadow: 0 0 30px rgba(226, 176, 74, 0.5);">PRIME ACCESS</h1>
+        <h1 style="color:var(--accent); font-size:2.4rem; margin-bottom:40px; letter-spacing:2px; text-shadow: 0 0 30px rgba(226, 176, 74, 0.5);">ADMIN LOGIN</h1>
         <div class="login-box">
-            <i class="fa-solid fa-fingerprint" style="font-size:3.5rem; color:var(--accent); margin-bottom:30px; opacity:0.8;"></i>
+            <i class="fa-solid fa-user-shield" style="font-size:3.5rem; color:var(--accent); margin-bottom:30px; opacity:0.8;"></i>
             
-            <input type="text" style="display:none;" autocomplete="username">
-            <input type="password" style="display:none;" autocomplete="current-password">
-
-            <input type="password" id="adminPw" class="login-input" placeholder="ACCESS CODE" maxlength="4" autocomplete="new-password">
+            <input type="text" id="adminId" class="login-input" placeholder="ID" autocomplete="off">
+            <input type="password" id="adminPw" class="login-input" placeholder="PASSWORD" autocomplete="new-password">
             <button class="login-btn" onclick="tryLogin()">시스템 접속</button>
             <div id="loginMsg" style="color:var(--danger); margin-top:20px; font-size:0.9rem; height:20px; font-weight:bold;"></div>
         </div>
@@ -236,12 +236,12 @@
     <div id="app-container">
         <div class="sidebar">
             <div class="brand">
-                CAJGHN OPS
+                관리 페이지
             </div>
             
             <div class="nav-btn active"><i class="fa-solid fa-chart-pie"></i> 대시보드</div>
             <div class="nav-btn" onclick="openModal('manualModal')"><i class="fa-solid fa-book-bookmark"></i> 시스템 매뉴얼</div>
-            <div class="nav-btn" onclick="downloadCSV()"><i class="fa-solid fa-file-arrow-down"></i> 데이터 백업</div>
+            <div class="nav-btn" onclick="confirmCSVDownload()"><i class="fa-solid fa-file-arrow-down"></i> 데이터 백업</div>
 
             <div class="sidebar-footer">
                 <div class="manual-refresh-btn" onclick="safeFetchData()">
@@ -286,9 +286,6 @@
             <div class="control-bar">
                 <div style="display:flex; align-items:center; gap:15px;">
                     <input type="text" class="search-input" id="searchInput" placeholder="ID 또는 닉네임 검색..." onkeyup="filterData()">
-                    <button class="btn btn-green" onclick="openCreateModal()">
-                        <i class="fa-solid fa-user-plus"></i> 신규 등록
-                    </button>
                     <span id="selectLabel" style="font-size:0.9rem; color:var(--text-sub); display:none; margin-left:10px;">
                         <b style="color:var(--accent);" id="selectCount">0</b> 명 선택됨
                     </span>
@@ -353,26 +350,6 @@
         </div>
     </div>
 
-    <div class="modal-overlay" id="createModal">
-        <div class="modal-box">
-            <h2 style="margin-top:0; color:var(--success);"><i class="fa-solid fa-user-plus"></i> 신규 유저 등록</h2>
-            <div class="form-group">
-                <label class="form-label">실명 ID (로그인용)</label>
-                <input type="text" id="newId" class="form-input" placeholder="영문/숫자 입력">
-            </div>
-            <div class="form-group">
-                <label class="form-label">닉네임</label>
-                <input type="text" id="newName" class="form-input">
-            </div>
-            <div class="form-group">
-                <label class="form-label">초기 지급 포인트</label>
-                <input type="number" id="newPoint" class="form-input" value="0">
-            </div>
-            <button class="btn btn-green" style="width:100%; justify-content:center; padding:14px; margin-top:10px;" onclick="createNewUser()">등록 완료</button>
-            <div style="text-align:center; margin-top:20px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('createModal')">취소</div>
-        </div>
-    </div>
-
     <div class="modal-overlay" id="batchModal">
         <div class="modal-box">
             <h2 id="batchTitle" style="margin-top:0; color:var(--text);">일괄 작업 확인</h2>
@@ -386,19 +363,32 @@
         </div>
     </div>
 
+    <div class="modal-overlay" id="securityModal">
+        <div class="modal-box" style="width:400px; text-align:center;">
+            <i class="fa-solid fa-shield-halved" style="font-size:3rem; color:var(--danger); margin-bottom:20px;"></i>
+            <h2 style="margin:0; color:var(--text); margin-bottom:10px;">보안 인증 필요</h2>
+            <p style="color:var(--text-sub); margin-bottom:25px; font-size:0.9rem;">중요 작업을 수행하려면 보안 키를 입력하세요.</p>
+            
+            <input type="password" id="securityKeyInput" class="form-input" placeholder="SECURITY KEY" style="text-align:center; letter-spacing:4px; font-weight:bold; font-size:1.2rem;" maxlength="4">
+            
+            <button class="btn btn-danger" style="width:100%; margin-top:20px; justify-content:center; padding:14px;" onclick="checkSecurity()">인증 및 실행</button>
+            <div style="text-align:center; margin-top:20px; cursor:pointer; color:var(--text-sub);" onclick="closeModal('securityModal')">취소</div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="manualModal">
         <div class="modal-box" style="width:600px; max-height:80vh; display:flex; flex-direction:column;">
             <h2 style="margin-top:0; color:var(--accent);"><i class="fa-solid fa-book"></i> 관리자 매뉴얼</h2>
             <div style="overflow-y:auto; flex:1; padding-right:10px;">
                 <div class="manual-head">1. 보안 접속</div>
                 <ul class="manual-list">
-                    <li>관리자에게 부여받은 <b>보안 코드</b>를 입력하여 시스템에 접속합니다.</li>
+                    <li>관리자 전용 ID와 Password를 입력하여 접속합니다.</li>
                     <li>로그인 세션은 새로고침 시 초기화됩니다.</li>
                 </ul>
                 <div class="manual-head">2. 유저 관리</div>
                 <ul class="manual-list">
-                    <li><b>신규 등록:</b> 상단 <span style="color:var(--success)">+ 신규 등록</span> 버튼을 통해 계정을 생성합니다.</li>
                     <li><b>수정/삭제:</b> 리스트 우측 연필 버튼으로 자산 조정 및 계정 삭제가 가능합니다.</li>
+                    <li><b>중요 작업(삭제/백업):</b> 보안 키 입력이 필요합니다.</li>
                 </ul>
                 <div class="manual-head">3. 일괄 작업</div>
                 <ul class="manual-list">
@@ -422,12 +412,17 @@
         let selectedIds = new Set();
         let currentBatchType = '';
         let autoRefreshInterval = null;
+        let pendingCallback = null;
 
         const SUPABASE_URL = "https://nzdbalmwypdixduickzv.supabase.co"; 
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56ZGJhbG13eXBkaXhkdWlja3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNjc0MjgsImV4cCI6MjA4MDk0MzQyOH0.xskVDK0fIedVzC74bluatdhzXHY8ujKJVCQTiVcy824";
 
+        const adminIds = ['cajghn', 'mors0821'];
+
         document.addEventListener('DOMContentLoaded', () => {
+            const idInput = document.getElementById('adminId');
             const pwInput = document.getElementById('adminPw');
+            if(idInput) idInput.value = '';
             if(pwInput) pwInput.value = '';
 
             if (window.supabase) {
@@ -448,7 +443,6 @@
                 pwInput.addEventListener('keyup', (e) => {
                     if (e.key === 'Enter') tryLogin();
                 });
-                pwInput.focus();
             }
         });
 
@@ -464,11 +458,13 @@
         }
 
         function tryLogin() {
+            const idInput = document.getElementById('adminId');
             const pwInput = document.getElementById('adminPw');
+            const id = idInput.value;
             const pw = pwInput.value;
             const msg = document.getElementById('loginMsg');
             
-            if (pw === "0725") {
+            if (id === "manager" && pw === "777") {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-container').style.display = 'flex';
                 safeFetchData();
@@ -476,7 +472,7 @@
                 const box = document.querySelector('.login-box');
                 box.style.transform = "translateX(5px)";
                 setTimeout(() => box.style.transform = "translateX(0)", 100);
-                msg.innerText = "보안 코드가 일치하지 않습니다.";
+                msg.innerText = "아이디 또는 비밀번호가 일치하지 않습니다.";
                 pwInput.value = '';
                 pwInput.focus();
             }
@@ -527,13 +523,17 @@
                 
                 const point = u.point || 0;
 
-                if (point >= 100000000) { 
-                    rowClass = 'row-vvip'; 
-                    badge = `<span class="badge badge-vvip"><i class="fa-solid fa-crown"></i> VVIP</span>`; 
-                } else if (point >= 10000000) { 
-                    badge = `<span class="badge badge-vip">VIP</span>`; 
-                } else if (point >= 5000000) { 
-                    badge = `<span class="badge badge-high">High</span>`; 
+                if (adminIds.includes(u.real_id)) {
+                    badge = `<span class="badge badge-admin"><i class="fa-solid fa-user-shield"></i> 관리자</span>`;
+                } else {
+                    if (point >= 100000000) { 
+                        rowClass = 'row-vvip'; 
+                        badge = `<span class="badge badge-vvip"><i class="fa-solid fa-crown"></i> VVIP</span>`; 
+                    } else if (point >= 10000000) { 
+                        badge = `<span class="badge badge-vip">VIP</span>`; 
+                    } else if (point >= 5000000) { 
+                        badge = `<span class="badge badge-high">High</span>`; 
+                    }
                 }
 
                 let dateStr = "-";
@@ -560,33 +560,6 @@
                 tbody.appendChild(tr);
             });
             updateBatchUI();
-        }
-
-        function openCreateModal() {
-            document.getElementById('newId').value = '';
-            document.getElementById('newName').value = '';
-            document.getElementById('newPoint').value = 0;
-            openModal('createModal');
-        }
-
-        async function createNewUser() {
-            if (!supabase) return;
-            const id = document.getElementById('newId').value.trim();
-            const name = document.getElementById('newName').value.trim();
-            const point = parseInt(document.getElementById('newPoint').value) || 0;
-
-            if (!id || !name) { showToast("ID와 닉네임을 모두 입력하세요.", "error"); return; }
-
-            try {
-                const { error } = await supabase.from('users').insert({ real_id: id, name: name, point: point });
-                if (error) throw error;
-                
-                showToast("유저 생성 완료", "success");
-                closeModal('createModal');
-                safeFetchData(true);
-            } catch (err) {
-                showToast("생성 실패: ID 중복 등 확인 필요", "error");
-            }
         }
 
         function openEdit(id) {
@@ -624,19 +597,41 @@
             }
         }
 
-        async function deleteSingle() {
-            if (!confirm("정말 이 유저를 영구 삭제하시겠습니까?")) return;
-            const id = document.getElementById('targetId').value;
-            
-            try {
-                const { error } = await supabase.from('users').delete().eq('real_id', id);
-                if (error) throw error;
-                showToast("삭제 완료");
-                closeModal('editModal');
-                safeFetchData(true);
-            } catch(err) {
-                showToast("삭제 실패", "error");
+        function openSecurityCheck(callback) {
+            pendingCallback = callback;
+            document.getElementById('securityKeyInput').value = '';
+            openModal('securityModal');
+            document.getElementById('securityKeyInput').focus();
+        }
+
+        function checkSecurity() {
+            const key = document.getElementById('securityKeyInput').value;
+            if (key === '0725') {
+                closeModal('securityModal');
+                if (pendingCallback) pendingCallback();
+                pendingCallback = null;
+            } else {
+                showToast("보안 키가 일치하지 않습니다.", "error");
+                document.getElementById('securityKeyInput').value = '';
+                document.getElementById('securityKeyInput').focus();
             }
+        }
+
+        function deleteSingle() {
+            if (!confirm("정말 이 유저를 영구 삭제하시겠습니까?")) return;
+            
+            openSecurityCheck(async () => {
+                const id = document.getElementById('targetId').value;
+                try {
+                    const { error } = await supabase.from('users').delete().eq('real_id', id);
+                    if (error) throw error;
+                    showToast("삭제 완료");
+                    closeModal('editModal');
+                    safeFetchData(true);
+                } catch(err) {
+                    showToast("삭제 실패", "error");
+                }
+            });
         }
 
         function addQ(val) {
@@ -697,34 +692,42 @@
             openModal('batchModal');
         }
 
-        async function executeBatch() {
+        function executeBatch() {
             if (!supabase) return;
             if (!confirm("선택한 유저들에게 작업을 수행하시겠습니까? 돌이킬 수 없습니다.")) return;
 
-            const amount = parseInt(document.getElementById('batchAmount').value) || 0;
-            const ids = Array.from(selectedIds);
-            
-            let successCnt = 0;
-            for (let id of ids) {
-                try {
-                    if (currentBatchType === 'bonus') {
-                        const u = allUsers.find(x => x.real_id === id);
-                        if (u) await supabase.from('users').update({ point: u.point + amount }).eq('real_id', id);
-                    } else if (currentBatchType === 'reset') {
-                        await supabase.from('users').update({ point: 0 }).eq('real_id', id);
-                    } else {
-                        await supabase.from('users').delete().eq('real_id', id);
+            const runBatch = async () => {
+                const amount = parseInt(document.getElementById('batchAmount').value) || 0;
+                const ids = Array.from(selectedIds);
+                
+                let successCnt = 0;
+                for (let id of ids) {
+                    try {
+                        if (currentBatchType === 'bonus') {
+                            const u = allUsers.find(x => x.real_id === id);
+                            if (u) await supabase.from('users').update({ point: u.point + amount }).eq('real_id', id);
+                        } else if (currentBatchType === 'reset') {
+                            await supabase.from('users').update({ point: 0 }).eq('real_id', id);
+                        } else {
+                            await supabase.from('users').delete().eq('real_id', id);
+                        }
+                        successCnt++;
+                    } catch (e) {
+                        console.error(e);
                     }
-                    successCnt++;
-                } catch (e) {
-                    console.error(e);
                 }
+                
+                showToast(`${successCnt}명 작업 완료`);
+                closeModal('batchModal');
+                selectedIds.clear();
+                safeFetchData(true);
+            };
+
+            if (currentBatchType === 'delete') {
+                openSecurityCheck(runBatch);
+            } else {
+                runBatch();
             }
-            
-            showToast(`${successCnt}명 작업 완료`);
-            closeModal('batchModal');
-            selectedIds.clear();
-            safeFetchData(true);
         }
 
         function openModal(id) { 
@@ -765,8 +768,12 @@
             });
         }
 
-        function downloadCSV() {
+        function confirmCSVDownload() {
             if (allUsers.length === 0) { showToast("다운로드할 데이터가 없습니다.", "error"); return; }
+            openSecurityCheck(downloadCSV);
+        }
+
+        function downloadCSV() {
             let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
             csvContent += "ID,Name,Point,JoinDate\n";
             
@@ -781,6 +788,7 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            showToast("보안 인증 성공: 다운로드 시작", "success");
         }
 
         function showToast(msg, type = 'info') {
