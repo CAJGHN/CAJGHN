@@ -29,6 +29,9 @@
             overflow-x: hidden;
             width: 100%;
             line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .header {
@@ -102,6 +105,10 @@
             border-color: var(--accent);
         }
 
+        .game-area {
+            flex: 1;
+        }
+
         .game-list {
             display: flex;
             justify-content: center;
@@ -136,6 +143,18 @@
             background: rgba(255, 255, 255, 0.1);
             color: var(--accent);
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        /* 푸터 스타일 추가 */
+        .footer-text {
+            padding: 40px;
+            text-align: center;
+            font-size: 14px;
+            color: var(--subtext);
+            width: 100%;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: #0D0D1A;
+            margin-top: auto;
         }
 
         @media (max-width: 768px) {
@@ -281,6 +300,10 @@
             <button class="game-btn" onclick="moveGame('rocket.html')">ROCKET</button>
             <button class="game-btn" onclick="moveGame('minigames.html')">MINI GAMES</button>
         </div>
+    </div>
+
+    <div class="footer-text">
+        &copy; 2025 CAJGHN. All Rights Reserved.
     </div>
 
     <div id="login-modal" class="modal-overlay">
