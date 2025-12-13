@@ -40,50 +40,60 @@
             align-items: center;
         }
 
+        .header {
+            width: 100%;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 20, 0.85);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 210;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
         .brand-logo {
-            position: absolute;
-            top: 40px;
-            left: 40px;
-            font-size: 30px;
+            font-size: 24px;
             font-weight: 800;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             color: var(--accent);
             text-decoration: none;
             cursor: pointer;
+            text-transform: uppercase;
         }
 
         .search-container {
-            position: absolute;
-            top: 40px;
-            right: 40px;
-            z-index: 202;
+            position: relative;
         }
 
         #searchInput {
-            background: var(--panel);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 10px 15px;
             color: var(--text);
-            font-size: 1rem;
+            font-size: 15px;
             outline: none;
-            width: 300px;
+            width: 250px;
             transition: var(--transition);
         }
 
         #searchInput:focus {
             border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
         }
 
         #searchInput::placeholder {
-            color: rgba(255, 255, 255, 0.3);
+            color: var(--subtext);
         }
 
         .main-content {
             width: 100%;
             max-width: 1200px;
-            padding: 150px 40px 40px;
+            padding: 80px 40px 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -91,9 +101,9 @@
         }
 
         h2.section-title { 
-            font-size: 44px; 
+            font-size: 40px; 
             font-weight: 800;
-            margin-bottom: 60px; 
+            margin-bottom: 50px; 
             color: var(--text); 
             text-align: center;
         }
@@ -101,37 +111,41 @@
         .video-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 50px;
+            gap: 40px;
             width: 100%;
         }
 
         .video-card {
             background: var(--panel);
-            padding: 45px;
+            padding: 40px;
             border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.08);
             transition: var(--transition);
             cursor: pointer;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 200px; 
         }
 
         .video-card:hover {
             transform: translateY(-10px);
             border-color: var(--accent);
             background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
         .card-info h3 { 
             font-size: 24px;
             font-weight: 700;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             color: var(--text);
         }
         
         .card-info p { 
             color: var(--subtext);
-            line-height: 1.7;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .footer-text {
@@ -140,6 +154,9 @@
             font-size: 14px;
             color: var(--subtext);
             width: 100%;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: #0D0D1A;
+            margin-top: auto;
         }
 
         #viewer-sidebar {
@@ -150,24 +167,26 @@
             height: 100%;
             background: rgba(10, 10, 20, 0.95);
             backdrop-filter: blur(10px);
-            padding: 40px;
+            padding: 30px;
             border-right: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 100;
             display: none;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
         }
 
         .back-btn {
             background: transparent; 
             border: 1px solid rgba(255, 255, 255, 0.2); 
-            padding: 12px 20px;
+            padding: 10px 15px;
             cursor: pointer;
-            font-size: 1rem; 
+            font-size: 14px; 
             color: var(--subtext); 
             margin-bottom: 40px;
             width: 100%;
             text-align: left;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: var(--transition);
+            font-weight: 600;
         }
         .back-btn:hover { 
             border-color: var(--accent);
@@ -175,10 +194,11 @@
         }
         
         h1#viewer-title { 
-            font-size: 2rem; 
+            font-size: 28px; 
             font-weight: 800;
             margin: 0 0 30px 0; 
             color: var(--text); 
+            line-height: 1.2;
         }
         
         .control-group { 
@@ -189,9 +209,10 @@
         
         label { 
             display: block; 
-            margin-bottom: 15px; 
+            margin-bottom: 10px; 
             font-weight: 500; 
             color: var(--subtext); 
+            font-size: 14px;
         }
         
         input[type="color"] { 
@@ -202,62 +223,50 @@
             cursor: pointer; 
             background: transparent; 
             padding: 2px;
+            transition: var(--transition);
+        }
+        input[type="color"]:hover {
+            border-color: var(--accent);
         }
 
         .download-btn {
             display: block;
             width: 100%;
-            padding: 15px 0;
+            padding: 12px 0;
             margin-top: 40px;
-            background: transparent;
+            background: var(--accent);
             border: 1px solid var(--accent);
-            color: var(--accent);
+            color: #000;
             text-align: center;
             text-decoration: none;
-            font-size: 1rem;
+            font-size: 15px;
             font-weight: 700;
-            border-radius: 8px;
+            border-radius: 6px;
             transition: var(--transition);
         }
         .download-btn:hover {
-            background: var(--accent);
-            color: var(--bg);
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
         }
 
         .instructions { 
             margin-top: 50px; 
-            font-size: 0.9rem; 
+            font-size: 13px; 
             color: var(--subtext); 
             line-height: 1.8;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 20px;
         }
 
-        @media (max-width: 700px) {
-            .brand-logo { 
-                left: 20px; 
-                top: 20px; 
-                font-size: 24px; 
-            }
-            .search-container {
-                top: 70px;
-                right: 20px;
-                left: 20px;
-                width: auto;
-            }
-            #searchInput {
-                width: 100%;
-            }
-            .main-content { 
-                padding: 140px 20px 20px; 
-            }
-            h2.section-title { 
-                font-size: 32px; 
-            }
-            .video-grid { 
-                grid-template-columns: 1fr; 
-            }
+        @media (max-width: 768px) {
+            .header { padding: 15px 20px; flex-direction: column; gap: 15px; }
+            .search-container { width: 100%; }
+            #searchInput { width: 100%; }
+            .main-content { padding: 40px 20px; }
+            h2.section-title { font-size: 32px; margin-bottom: 30px; }
+            .video-grid { grid-template-columns: 1fr; }
+            #viewer-sidebar { width: 100%; height: auto; bottom: 0; top: auto; border-right: none; border-top: 1px solid rgba(255,255,255,0.1); }
         }
     </style>
     
@@ -273,10 +282,12 @@
 <body>
 
     <div id="home-screen">
-        <a class="brand-logo" href="javascript:location.reload()">CAJGHN Studio</a>
-        
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="Search models">
+        <div class="header">
+            <a class="brand-logo" href="javascript:location.reload()">CAJGHN Studio</a>
+            
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search models">
+            </div>
         </div>
         
         <div class="main-content">
@@ -296,6 +307,13 @@
                         <p>Interactive 3D View & Download</p>
                     </div>
                 </div>
+                
+                <div class="video-card" style="opacity: 0.5; cursor: default;">
+                    <div class="card-info">
+                        <h3>Coming Soon</h3>
+                        <p>More assets are being developed.</p>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -305,21 +323,22 @@
     </div>
 
     <div id="viewer-sidebar">
-        <button class="back-btn" onclick="goHome()">Back to Studio</button>
+        <button class="back-btn" onclick="goHome()">← Back to List</button>
         
         <h1 id="viewer-title">Model Name</h1>
         
         <div class="control-group">
-            <label for="colorPicker">Customize Color</label>
+            <label for="colorPicker">Customize Material Color</label>
             <input type="color" id="colorPicker" value="#FFD700"> 
         </div>
 
-        <a id="download-link" class="download-btn" href="#" download>Download STL</a>
+        <a id="download-link" class="download-btn" href="#" download>Download STL File</a>
         
         <div class="instructions">
-            Left Click: Rotate<br>
-            Right Click: Pan<br>
-            Scroll: Zoom
+            <strong>Controls:</strong><br>
+            Left Click + Drag: Rotate<br>
+            Right Click + Drag: Pan<br>
+            Scroll: Zoom In/Out
         </div>
     </div>
 
@@ -406,8 +425,6 @@
                 scene.add(currentMesh);
             }, undefined, function (error) {
                 console.error(error);
-                alert("File not found");
-                goHome();
             });
         }
 
@@ -422,7 +439,7 @@
             cards.forEach(card => {
                 const title = card.querySelector('h3').innerText.toLowerCase();
                 if (title.includes(searchTerm)) {
-                    card.style.display = 'block';
+                    card.style.display = 'flex';
                 } else {
                     card.style.display = 'none';
                 }
