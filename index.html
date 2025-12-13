@@ -150,6 +150,10 @@
         border: 1px solid rgba(255, 255, 255, 0.08);
         transition: var(--transition);
         position: relative;
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
     }
 
     .card:hover {
@@ -232,66 +236,28 @@
     }
 
     @media (max-width: 1200px) {
-        .hero h1 {
-            font-size: 68px;
-        }
-        .section-header h2 {
-            font-size: 38px;
-        }
+        .hero h1 { font-size: 68px; }
+        .section-header h2 { font-size: 38px; }
     }
 
     @media (max-width: 1000px) {
-        header {
-            padding: 18px 40px;
-        }
-        .cards {
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-        .hero h1 {
-            font-size: 56px;
-        }
-        .footer-grid {
-            grid-template-columns: 1fr 1fr;
-        }
+        header { padding: 18px 40px; }
+        .cards { grid-template-columns: 1fr 1fr; gap: 30px; }
+        .hero h1 { font-size: 56px; }
+        .footer-grid { grid-template-columns: 1fr 1fr; }
     }
 
     @media (max-width: 700px) {
-        header {
-            flex-direction: column;
-            gap: 20px;
-            padding: 15px 20px;
-        }
-        nav {
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-        }
-        .cards {
-            grid-template-columns: 1fr;
-        }
-        .hero {
-            padding: 120px 20px 100px;
-        }
-        .hero h1 {
-            font-size: 40px;
-        }
-        .hero p {
-            font-size: 18px;
-        }
-        .section {
-            padding: 80px 20px;
-        }
-        .section-header h2 {
-            font-size: 30px;
-        }
-        .footer-grid {
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
-        .footer-about {
-            order: 4;
-        }
+        header { flex-direction: column; gap: 20px; padding: 15px 20px; }
+        nav { flex-wrap: wrap; justify-content: center; gap: 20px; }
+        .cards { grid-template-columns: 1fr; }
+        .hero { padding: 120px 20px 100px; }
+        .hero h1 { font-size: 40px; }
+        .hero p { font-size: 18px; }
+        .section { padding: 80px 20px; }
+        .section-header h2 { font-size: 30px; }
+        .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+        .footer-about { order: 4; }
     }
 </style>
 </head>
@@ -300,10 +266,10 @@
 <header>
     <a class="logo" href="/">CAJGHN</a>
     <nav>
-        <a href="https://cajghn.com/studio" target="_blank">Studio</a>
+        <a href="./studio/">Studio</a>
+        <a href="./casino/">Casino</a>
         <a href="https://cajghn.com/crypto" target="_blank">Crypto</a>
         <a href="https://cajghn.com/lounge" target="_blank">Lounge</a>
-        <a href="https://cajghn.com/casino" target="_blank">Casino</a>
         <a href="https://cajghn.com/memo" target="_blank">Memo</a>
     </nav>
 </header>
@@ -320,26 +286,31 @@
     </div>
     
     <div class="cards">
-        <div class="card">
+        <a href="./studio/" class="card">
             <h3>Studio</h3>
             <p>A platform where you can freely download high-quality 3D files designed by CAJGHN. Explore and obtain professional-grade assets directly—completely free.</p>
-        </div>
+        </a>
+
         <div class="card">
             <h3>Crypto</h3>
             <p>A platform to view real-time cryptocurrency prices and market trends, providing up-to-date information at a glance.</p>
         </div>
+
         <div class="card">
             <h3>Lounge</h3>
             <p>A place to chat and connect with people from around the world in a simple, secure environment.</p>
         </div>
-        <div class="card">
-            <h3>Games</h3>
-            <p>Play Coloin, a fun and engaging game, directly on the platform—completely free.</p>
-        </div>
+
+        <a href="./casino/" class="card">
+            <h3>Games (Casino)</h3>
+            <p>Play games like Roulette and Blackjack, directly on the platform—completely free.</p>
+        </a>
+
         <div class="card">
             <h3>Memo</h3>
             <p>An online notepad to quickly write, save, and view your notes anytime.</p>
         </div>
+
         <div class="card">
             <h3>Expansion & Future</h3>
             <p>CAJGHN continuously evolves, integrating new technologies and services. We maintain an ongoing expansion roadmap to deliver more value to the ecosystem.</p>
@@ -356,17 +327,17 @@
         <div>
             <h3 class="footer-heading">Product</h3>
             <ul class="footer-list">
-                <li><a href="https://cajghn.com/features" target="_blank">Features</a></li>
-                <li><a href="https://cajghn.com/documentation" target="_blank">Documentation</a></li>
-                <li><a href="https://cajghn.com/pricing" target="_blank">Pricing</a></li>
+                <li><a href="#" target="_blank">Features</a></li>
+                <li><a href="#" target="_blank">Documentation</a></li>
+                <li><a href="#" target="_blank">Pricing</a></li>
             </ul>
         </div>
         <div>
             <h3 class="footer-heading">Company</h3>
             <ul class="footer-list">
-                <li><a href="https://cajghn.com/about" target="_blank">About</a></li>
-                <li><a href="https://cajghn.com/contact" target="_blank">Contact</a></li>
-                <li><a href="https://cajghn.com/partners" target="_blank">Partners</a></li>
+                <li><a href="#" target="_blank">About</a></li>
+                <li><a href="#" target="_blank">Contact</a></li>
+                <li><a href="#" target="_blank">Partners</a></li>
             </ul>
         </div>
         <div>
@@ -385,4 +356,3 @@
 
 </body>
 </html>
-
