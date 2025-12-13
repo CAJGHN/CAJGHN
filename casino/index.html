@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAJGHN Casino</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg: #0A0A14;
+            --panel: rgba(255, 255, 255, 0.06);
+            --text: #F5F7FA;
+            --subtext: #A0AEC0;
+            --accent: #FFD700;
+            --transition: 0.3s ease-out;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            text-align: center;
+            overflow-x: hidden;
+            width: 100%;
+            line-height: 1.6;
+        }
+
+        .header {
+            width: 100%;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            backdrop-filter: blur(20px);
+            background: rgba(10, 10, 20, 0.85);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            margin-bottom: 40px;
+        }
+        
+        .brand {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--accent);
+            cursor: pointer;
+            user-select: none;
+            text-transform: uppercase;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px; 
+            flex-shrink: 0;
+        }
+
+        .info-group {
+            display: none; 
+            gap: 15px; 
+            text-align: right;
+            font-size: 15px;
+            color: var(--subtext);
+            white-space: nowrap;
+        }
+        
+        .info-group span {
+            color: var(--text);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px; 
+        }
+
+        .action-btn {
+            background: transparent;
+            color: var(--subtext);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            transition: var(--transition);
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .game-list {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex-wrap: wrap; 
+        }
+
+        .game-btn {
+            width: 160px;
+            height: 110px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            background: var(--panel);
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            font-family: inherit;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-transform: uppercase;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--accent);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .header { 
+                padding: 15px 20px; 
+                flex-direction: column; 
+                gap: 15px; 
+            }
+            .header-right { 
+                width: 100%; 
+                justify-content: center; 
+                flex-wrap: wrap; 
+            }
+            .info-group {
+                justify-content: center;
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            .game-btn {
+                width: 45%;
+                min-width: 140px;
+            }
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-box {
+            background: #0D0D1A;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            width: 90%;
+            max-width: 320px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: left;
+        }
+
+        .modal-box h2 {
+            margin-top: 0;
+            color: var(--text);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            box-sizing: border-box;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            font-family: inherit;
+            border-radius: 6px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        input:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-full {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            cursor: pointer;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            font-family: inherit;
+            font-weight: 700;
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+
+        .btn-full:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .btn-full:last-child {
+            background: transparent;
+            color: var(--subtext);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 10px;
+        }
+
+        .btn-full:last-child:hover {
+            color: var(--text);
+            border-color: var(--text);
+        }
+        
+        input[type="password"]::-ms-reveal, input[type="password"]::-ms-clear { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="brand" onclick="location.reload()">CAJGHN Casino</div>
+        
+        <div class="header-right">
+            <div id="user-info-text" class="info-group">
+                <div><span id="user-name" style="font-weight: bold;">-</span> 님</div>
+                <div>잔액: <span id="user-point" style="font-weight: bold;">0</span></div>
+            </div>
+
+            <div class="btn-group">
+                <button id="btn-left" class="action-btn" onclick="clickLeftBtn()">로그인</button>
+                <button id="btn-right" class="action-btn" onclick="clickRightBtn()">회원가입</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-area" id="game-container">
+        <div class="game-list">
+            <button class="game-btn" onclick="moveGame('ranking.html')">RANKING</button>
+            <button class="game-btn" onclick="moveGame('blackjack.html')">BLACKJACK</button>
+            <button class="game-btn" onclick="moveGame('baccarat.html')">BACCARAT</button>
+            <button class="game-btn" onclick="moveGame('roulette.html')">ROULETTE</button>
+            <button class="game-btn" onclick="moveGame('slot.html')">SLOT</button>
+            <button class="game-btn" onclick="moveGame('dice.html')">DICE</button>
+            <button class="game-btn" onclick="moveGame('dragontiger.html')">DRAGON TIGER</button>
+            <button class="game-btn" onclick="moveGame('sicbo.html')">SICBO</button>
+            <button class="game-btn" onclick="moveGame('videopoker.html')">VIDEO POKER</button>
+            <button class="game-btn" onclick="moveGame('holdem.html')">HOLD'EM</button>
+            <button class="game-btn" onclick="moveGame('bigwheel.html')">BIG WHEEL</button>
+            <button class="game-btn" onclick="moveGame('keno.html')">KENO</button>
+            <button class="game-btn" onclick="moveGame('highlow.html')">HIGH LOW</button>
+            <button class="game-btn" onclick="moveGame('craps.html')">CRAPS</button>
+            <button class="game-btn" onclick="moveGame('pachinko.html')">PACHINKO</button>
+            <button class="game-btn" onclick="moveGame('pinball.html')">PINBALL</button>
+            <button class="game-btn" onclick="moveGame('rocket.html')">ROCKET</button>
+            <button class="game-btn" onclick="moveGame('minigames.html')">MINI GAMES</button>
+        </div>
+    </div>
+
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h2>로그인</h2>
+            <input type="text" id="login-id" placeholder="아이디">
+            <input type="password" id="login-pw" placeholder="비밀번호">
+            <br><br>
+            <button class="btn-full" onclick="processLogin()">로그인</button>
+            <button class="btn-full" onclick="closeModal()">닫기</button>
+        </div>
+    </div>
+
+    <div id="join-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h2>회원가입</h2>
+            <input type="text" id="join-id" placeholder="아이디 (영어)">
+            <input type="password" id="join-pw" placeholder="비밀번호 (6자 이상)">
+            <input type="password" id="join-pw-confirm" placeholder="비밀번호 확인">
+            <input type="text" id="join-name" placeholder="닉네임 (한글)">
+            <br><br>
+            <button class="btn-full" onclick="processJoin()">회원가입</button>
+            <button class="btn-full" onclick="closeModal()">취소</button>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://nzdbalmwypdixduickzv.supabase.co"; 
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56ZGJhbG13eXBkaXhkdWlja3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNjc0MjgsImV4cCI6MjA4MDk0MzQyOH0.xskVDK0fIedVzC74bluatdhzXHY8ujKJVCQTiVcy824";
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const FAKE_DOMAIN = "@game.com";
+        
+        let currentUser = null;
+
+        const btnLeft = document.getElementById('btn-left');
+        const btnRight = document.getElementById('btn-right');
+        const userInfoText = document.getElementById('user-info-text');
+
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (session) {
+                currentUser = session.user;
+                updateHeaderUI(true);
+                fetchUserPoint();
+            } else {
+                currentUser = null;
+                updateHeaderUI(false);
+            }
+        });
+
+        function moveGame(url) {
+            if (!currentUser) {
+                alert("로그인 후 이용 가능합니다.");
+                return;
+            }
+            location.href = url;
+        }
+
+        function clickLeftBtn() {
+            if (currentUser) {
+                fetchUserPoint();
+                alert("잔액 정보를 새로 가져왔습니다.");
+            } else {
+                openModal('login-modal');
+            }
+        }
+
+        function clickRightBtn() {
+            if (currentUser) {
+                logout();
+            } else {
+                openModal('join-modal');
+            }
+        }
+
+        function updateHeaderUI(isLoggedIn) {
+            if (isLoggedIn) {
+                userInfoText.style.display = "flex"; 
+                btnLeft.innerText = "새로고침";
+                btnRight.innerText = "로그아웃";
+            } else {
+                userInfoText.style.display = "none";
+                btnLeft.innerText = "로그인";
+                btnRight.innerText = "회원가입";
+                document.getElementById('user-name').innerText = "-";
+                document.getElementById('user-point').innerText = "0";
+            }
+        }
+
+        function openModal(id) {
+            document.querySelectorAll('.modal-overlay').forEach(el => el.style.display = 'none');
+            document.getElementById(id).style.display = 'flex';
+            document.querySelectorAll('input').forEach(input => input.value = '');
+        }
+        function closeModal() {
+            document.querySelectorAll('.modal-overlay').forEach(el => el.style.display = 'none');
+        }
+
+        async function processJoin() {
+            const id = document.getElementById('join-id').value.trim();
+            const pw = document.getElementById('join-pw').value.trim();
+            const pw2 = document.getElementById('join-pw-confirm').value.trim();
+            const name = document.getElementById('join-name').value.trim();
+
+            if (!id || !name) return alert("빈칸을 채워주세요.");
+            if (pw !== pw2) return alert("비밀번호 불일치");
+            if (pw.length < 6) return alert("비밀번호 6자 이상");
+
+            const { data: idData } = await supabase.from('users').select('real_id').eq('real_id', id);
+            if (idData?.length > 0) return alert("이미 있는 아이디입니다.");
+
+            const { data: nameData } = await supabase.from('users').select('name').eq('name', name);
+            if (nameData?.length > 0) return alert("이미 있는 닉네임입니다.");
+
+            const { data, error } = await supabase.auth.signUp({
+                email: id + FAKE_DOMAIN,
+                password: pw,
+                options: {
+                    data: {
+                        real_id: id,
+                        name: name
+                    }
+                }
+            });
+            
+            if (error) {
+                return alert("가입 실패: " + error.message);
+            }
+
+            await supabase.auth.signOut(); 
+            
+            alert("회원가입 완료! 로그인 해주세요.");
+            closeModal();
+        }
+
+        async function processLogin() {
+            const id = document.getElementById('login-id').value.trim();
+            const pw = document.getElementById('login-pw').value.trim();
+            
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: id + FAKE_DOMAIN,
+                password: pw
+            });
+
+            if (error) return alert("정보가 틀렸습니다.");
+            closeModal();
+        }
+
+        async function fetchUserPoint() {
+            if (!currentUser) return;
+            const { data } = await supabase.from('users').select('*').eq('id', currentUser.id).single();
+            if (data) {
+                document.getElementById('user-name').innerText = data.name;
+                document.getElementById('user-point').innerText = data.point.toLocaleString();
+            }
+        }
+
+        async function logout() {
+            await supabase.auth.signOut();
+            alert("로그아웃 되었습니다.");
+            location.reload(); 
+        }
+    </script>
+</body>
+</html>
