@@ -101,51 +101,93 @@
         .action-btn:hover {
             color: var(--accent);
             border-color: var(--accent);
+            transform: translateY(-2px);
         }
 
-        .main-section {
-            padding: 80px 40px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .game-list {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            max-width: 1200px;
+        .main-container {
+            max-width: 1600px;
+            width: 100%;
             margin: 0 auto;
-            flex-wrap: wrap;
+            padding: 60px 40px;
+            flex: 1;
         }
 
-        .game-btn {
-            width: 180px;
-            height: 120px;
-            font-size: 16px;
+        .category-block {
+            margin-bottom: 60px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .category-title {
+            font-size: 22px;
             font-weight: 700;
-            cursor: pointer;
-            background: var(--panel);
             color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .game-card {
+            background: var(--panel);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            font-family: inherit;
+            border-radius: 8px;
+            height: 160px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
             transition: var(--transition);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            text-transform: uppercase;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            padding: 10px;
         }
 
-        .game-btn:hover {
-            transform: translateY(-8px);
+        .game-card:hover {
+            transform: translateY(-5px);
             border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .game-name {
+            position: relative;
+            z-index: 2;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .game-desc {
+            position: relative;
+            z-index: 2;
+            font-size: 13px;
+            color: var(--subtext);
+            margin-top: 5px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .game-card:hover .game-name {
             color: var(--accent);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .game-card:hover .game-desc {
+            color: #fff;
         }
 
         .modal-overlay {
@@ -222,8 +264,9 @@
         }
 
         .btn-full:last-child:hover {
-            color: var(--text);
-            border-color: var(--text);
+            color: var(--accent);
+            border-color: var(--accent);
+            transform: translateY(-2px);
         }
 
         @media (max-width: 900px) {
@@ -247,9 +290,8 @@
                 justify-content: center;
                 width: 100%;
             }
-            .game-btn {
-                width: 45%; 
-                min-width: 140px; 
+            .game-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -272,27 +314,93 @@
         </div>
     </header>
 
-    <section class="main-section">
-        <div class="game-list">
-            <button class="game-btn" onclick="moveGame('blackjack.html')">BLACKJACK</button>
-            <button class="game-btn" onclick="moveGame('baccarat.html')">BACCARAT</button>
-            <button class="game-btn" onclick="moveGame('roulette.html')">ROULETTE</button>
-            <button class="game-btn" onclick="moveGame('slot.html')">SLOT</button>
-            <button class="game-btn" onclick="moveGame('dice.html')">DICE</button>
-            <button class="game-btn" onclick="moveGame('dragontiger.html')">DRAGON TIGER</button>
-            <button class="game-btn" onclick="moveGame('sicbo.html')">SICBO</button>
-            <button class="game-btn" onclick="moveGame('videopoker.html')">VIDEO POKER</button>
-            <button class="game-btn" onclick="moveGame('holdem.html')">HOLD'EM</button>
-            <button class="game-btn" onclick="moveGame('bigwheel.html')">BIG WHEEL</button>
-            <button class="game-btn" onclick="moveGame('keno.html')">KENO</button>
-            <button class="game-btn" onclick="moveGame('highlow.html')">HIGH LOW</button>
-            <button class="game-btn" onclick="moveGame('craps.html')">CRAPS</button>
-            <button class="game-btn" onclick="moveGame('pachinko.html')">PACHINKO</button>
-            <button class="game-btn" onclick="moveGame('pinball.html')">PINBALL</button>
-            <button class="game-btn" onclick="moveGame('rocket.html')">ROCKET</button>
-            <button class="game-btn" onclick="moveGame('minigames.html')">MINI GAMES</button>
+    <div class="main-container">
+        
+        <div class="category-block">
+            <div class="category-header">
+                <div class="category-title">Card Games</div>
+            </div>
+            <div class="game-grid">
+                <div class="game-card" onclick="moveGame('blackjack.html')">
+                    <div class="game-name">Blackjack</div>
+                    <div class="game-desc">딜러를 이겨라</div>
+                </div>
+                <div class="game-card" onclick="moveGame('baccarat.html')">
+                    <div class="game-name">Baccarat</div>
+                    <div class="game-desc">플레이어 vs 뱅커</div>
+                </div>
+                <div class="game-card" onclick="moveGame('dragontiger.html')">
+                    <div class="game-name">Dragon Tiger</div>
+                    <div class="game-desc">용호상박</div>
+                </div>
+                <div class="game-card" onclick="moveGame('videopoker.html')">
+                    <div class="game-name">Video Poker</div>
+                    <div class="game-desc">최고의 족보를 완성하라</div>
+                </div>
+                <div class="game-card" onclick="moveGame('highlow.html')">
+                    <div class="game-name">High Low</div>
+                    <div class="game-desc">더 높은 카드를 예측하라</div>
+                </div>
+            </div>
         </div>
-    </section>
+
+        <div class="category-block">
+            <div class="category-header">
+                <div class="category-title">Table & Dice</div>
+            </div>
+            <div class="game-grid">
+                <div class="game-card" onclick="moveGame('roulette.html')">
+                    <div class="game-name">Roulette</div>
+                    <div class="game-desc">행운의 숫자를 맞춰라</div>
+                </div>
+                <div class="game-card" onclick="moveGame('sicbo.html')">
+                    <div class="game-name">Sic Bo</div>
+                    <div class="game-desc">주사위 3개의 합</div>
+                </div>
+                <div class="game-card" onclick="moveGame('bigwheel.html')">
+                    <div class="game-name">Big Wheel</div>
+                    <div class="game-desc">회전판의 행운</div>
+                </div>
+                <div class="game-card" onclick="moveGame('craps.html')">
+                    <div class="game-name">Craps</div>
+                    <div class="game-desc">주사위의 열기</div>
+                </div>
+                <div class="game-card" onclick="moveGame('dice.html')">
+                    <div class="game-name">Dice</div>
+                    <div class="game-desc">숫자를 맞춰라</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-block">
+            <div class="category-header">
+                <div class="category-title">Arcade & Slots</div>
+            </div>
+            <div class="game-grid">
+                <div class="game-card" onclick="moveGame('slot.html')">
+                    <div class="game-name">Slot</div>
+                    <div class="game-desc">잭팟을 노려라</div>
+                </div>
+                <div class="game-card" onclick="moveGame('keno.html')">
+                    <div class="game-name">Keno</div>
+                    <div class="game-desc">행운의 볼 추첨</div>
+                </div>
+                <div class="game-card" onclick="moveGame('pachinko.html')">
+                    <div class="game-name">Pachinko</div>
+                    <div class="game-desc">구슬의 향연</div>
+                </div>
+                <div class="game-card" onclick="moveGame('pinball.html')">
+                    <div class="game-name">Pinball</div>
+                    <div class="game-desc">점수를 획득하라</div>
+                </div>
+                <div class="game-card" onclick="moveGame('rocket.html')">
+                    <div class="game-name">Rocket</div>
+                    <div class="game-desc">타이밍이 생명</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 
     <div id="login-modal" class="modal-overlay">
         <div class="modal-box">
