@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CAJGHN Casino</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
@@ -16,85 +16,83 @@
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background: var(--bg);
             color: var(--text);
-            text-align: center;
             overflow-x: hidden;
-            width: 100%;
             line-height: 1.6;
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
         }
 
-        .header {
+        header {
             width: 100%;
-            padding: 15px 30px;
+            padding: 20px 60px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             backdrop-filter: blur(20px);
-            background: rgba(10, 10, 20, 0.85);
+            background: rgba(10, 10, 20, 0.75);
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 100;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            margin-bottom: 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
         }
-        
-        .brand {
-            font-size: 24px;
+
+        .logo {
+            font-size: 30px;
             font-weight: 800;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             color: var(--accent);
-            cursor: pointer;
-            user-select: none;
-            text-transform: uppercase;
             text-decoration: none;
-            white-space: nowrap;
+            text-transform: uppercase;
+            cursor: pointer;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 20px; 
-            flex-shrink: 0;
+            gap: 25px;
         }
 
         .info-group {
-            display: none; 
-            gap: 15px; 
+            display: none;
+            gap: 20px;
             text-align: right;
             font-size: 15px;
             color: var(--subtext);
-            white-space: nowrap;
+            font-weight: 500;
         }
         
         .info-group span {
             color: var(--text);
+            font-weight: 600;
         }
 
         .btn-group {
             display: flex;
-            gap: 10px; 
+            gap: 15px;
         }
 
         .action-btn {
             background: transparent;
             color: var(--subtext);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 16px;
+            padding: 8px 20px;
             cursor: pointer;
             font-family: inherit;
             font-weight: 500;
+            font-size: 14px;
             transition: var(--transition);
             border-radius: 4px;
             white-space: nowrap;
@@ -105,77 +103,49 @@
             border-color: var(--accent);
         }
 
-        .game-area {
+        .main-section {
+            padding: 80px 40px;
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .game-list {
             display: flex;
             justify-content: center;
-            gap: 25px;
-            padding: 20px;
+            gap: 30px;
             max-width: 1200px;
             margin: 0 auto;
-            flex-wrap: wrap; 
+            flex-wrap: wrap;
         }
 
         .game-btn {
-            width: 160px;
-            height: 110px;
+            width: 180px;
+            height: 120px;
             font-size: 16px;
             font-weight: 700;
             cursor: pointer;
             background: var(--panel);
             color: var(--text);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
+            border-radius: 15px;
             font-family: inherit;
             transition: var(--transition);
             display: flex;
             justify-content: center;
             align-items: center;
             text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
         .game-btn:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             border-color: var(--accent);
             background: rgba(255, 255, 255, 0.1);
             color: var(--accent);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .footer-text {
-            padding: 40px;
-            text-align: center;
-            font-size: 14px;
-            color: var(--subtext);
-            width: 100%;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            background: #0D0D1A;
-            margin-top: auto;
-        }
-
-        @media (max-width: 768px) {
-            .header { 
-                padding: 15px 20px; 
-                flex-direction: column; 
-                gap: 15px; 
-            }
-            .header-right { 
-                width: 100%; 
-                justify-content: center; 
-                flex-wrap: wrap; 
-            }
-            .info-group {
-                justify-content: center;
-                width: 100%;
-                margin-bottom: 5px;
-            }
-            .game-btn {
-                width: 45%;
-                min-width: 140px;
-            }
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
 
         .modal-overlay {
@@ -212,11 +182,10 @@
             width: 100%;
             padding: 12px;
             margin: 8px 0;
-            box-sizing: border-box;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: var(--text);
-            font-family: inherit;
+            font-size: 16px; 
             border-radius: 6px;
             outline: none;
             transition: var(--transition);
@@ -234,8 +203,8 @@
             background: var(--accent);
             color: #000;
             border: none;
-            font-family: inherit;
             font-weight: 700;
+            font-size: 16px;
             border-radius: 6px;
             transition: var(--transition);
         }
@@ -256,19 +225,44 @@
             color: var(--text);
             border-color: var(--text);
         }
-        
-        input[type="password"]::-ms-reveal, input[type="password"]::-ms-clear { display: none; }
+
+        @media (max-width: 900px) {
+            header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+                height: auto;
+            }
+            .header-right {
+                flex-direction: column;
+                width: 100%;
+                gap: 15px;
+            }
+            .info-group {
+                justify-content: center;
+                width: 100%;
+                text-align: center;
+            }
+            .btn-group {
+                justify-content: center;
+                width: 100%;
+            }
+            .game-btn {
+                width: 45%; 
+                min-width: 140px; 
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="brand" onclick="location.reload()">CAJGHN Casino</div>
+    <header>
+        <div class="logo" onclick="location.reload()">CAJGHN CASINO</div>
         
         <div class="header-right">
             <div id="user-info-text" class="info-group">
-                <div><span id="user-name" style="font-weight: bold;">-</span> 님</div>
-                <div>잔액: <span id="user-point" style="font-weight: bold;">0</span></div>
+                <div><span id="user-name">-</span> 님</div>
+                <div>Points: <span id="user-point">0</span></div>
             </div>
 
             <div class="btn-group">
@@ -276,11 +270,10 @@
                 <button id="btn-right" class="action-btn" onclick="clickRightBtn()">회원가입</button>
             </div>
         </div>
-    </div>
+    </header>
 
-    <div class="game-area" id="game-container">
+    <section class="main-section">
         <div class="game-list">
-            <button class="game-btn" onclick="moveGame('ranking.html')">RANKING</button>
             <button class="game-btn" onclick="moveGame('blackjack.html')">BLACKJACK</button>
             <button class="game-btn" onclick="moveGame('baccarat.html')">BACCARAT</button>
             <button class="game-btn" onclick="moveGame('roulette.html')">ROULETTE</button>
@@ -299,18 +292,13 @@
             <button class="game-btn" onclick="moveGame('rocket.html')">ROCKET</button>
             <button class="game-btn" onclick="moveGame('minigames.html')">MINI GAMES</button>
         </div>
-    </div>
-
-    <div class="footer-text">
-        &copy; 2025 CAJGHN. All Rights Reserved.
-    </div>
+    </section>
 
     <div id="login-modal" class="modal-overlay">
         <div class="modal-box">
             <h2>로그인</h2>
             <input type="text" id="login-id" placeholder="아이디">
             <input type="password" id="login-pw" placeholder="비밀번호">
-            <br><br>
             <button class="btn-full" onclick="processLogin()">로그인</button>
             <button class="btn-full" onclick="closeModal()">닫기</button>
         </div>
@@ -323,7 +311,6 @@
             <input type="password" id="join-pw" placeholder="비밀번호 (6자 이상)">
             <input type="password" id="join-pw-confirm" placeholder="비밀번호 확인">
             <input type="text" id="join-name" placeholder="닉네임 (한글)">
-            <br><br>
             <button class="btn-full" onclick="processJoin()">회원가입</button>
             <button class="btn-full" onclick="closeModal()">취소</button>
         </div>
