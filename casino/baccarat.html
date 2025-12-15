@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,32 +32,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         min-height: 100vh;
         padding: 20px;
-    }
-
-    header {
-        width: 100%;
-        max-width: 1000px;
-        display: flex;
-        justify-content: center;
-        margin-bottom: 30px;
-        padding-bottom: 15px;
-    }
-
-    h1 { 
-        margin: 0; 
-        color: #ffffff;
-        font-size: 2.5rem; 
-        letter-spacing: 2px; 
-        font-family: inherit;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
-        cursor: pointer;
-        transition: color 0.3s;
-    }
-
-    h1:hover {
-        color: var(--accent-gold);
     }
 
     .game-container {
@@ -297,14 +274,6 @@
         font-size: 1rem;
     }
 
-    .copyright {
-        margin-top: 40px;
-        color: #ffffff;
-        font-size: 0.9rem;
-        opacity: 0.8;
-        text-align: center;
-    }
-
     @media (max-width: 700px) {
         .table-section {
             flex-direction: column;
@@ -322,23 +291,19 @@
 </head>
 <body>
 
-    <header>
-        <h1 onclick="location.href='casino.html'">CAJGHN Baccarat</h1>
-    </header>
-
     <div class="game-container">
         
         <div class="table-section">
             <div class="hand-area">
                 <div class="hand-label">
-                    PLAYER <span id="playerScore" class="score-num">0</span>
+                    플레이어 <span id="playerScore" class="score-num">0</span>
                 </div>
                 <div id="playerCards" class="cards-container"></div>
             </div>
 
             <div class="hand-area">
                 <div class="hand-label">
-                    BANKER <span id="bankerScore" class="score-num">0</span>
+                    뱅커 <span id="bankerScore" class="score-num">0</span>
                 </div>
                 <div id="bankerCards" class="cards-container"></div>
             </div>
@@ -346,34 +311,32 @@
 
         <div class="betting-board">
             <div class="info-panel">
-                <span>Balance: <span class="money-box"><span id="balance" class="money">...</span></span></span>
-                <span>Current Bet: <span class="money-box"><span id="currentBetDisplay" class="money">0</span></span></span>
+                <span>보유 머니: <span class="money-box"><span id="balance" class="money">...</span></span></span>
+                <span>현재 베팅: <span class="money-box"><span id="currentBetDisplay" class="money">0</span></span></span>
             </div>
 
             <div class="controls">
                 <div>
-                    <span style="font-size:0.8rem; display:block; margin-bottom:4px; font-weight:bold;">Chip Size</span>
+                    <span style="font-size:0.8rem; display:block; margin-bottom:4px; font-weight:bold;">베팅 금액</span>
                     <input type="number" id="betAmount" value="100" min="100" step="100" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
                 </div>
                 
-                <button id="btnClear" class="action-btn">CLEAR</button>
-                <button id="btnDeal" class="action-btn">DEAL</button>
+                <button id="btnClear" class="action-btn">초기화</button>
+                <button id="btnDeal" class="action-btn">게임 시작</button>
             </div>
 
             <div class="controls-row-2">
-                <button id="btnPlayer" class="action-btn" onclick="placeBet('PLAYER')">PLAYER</button>
-                <button id="btnTie" class="action-btn" onclick="placeBet('TIE')">TIE</button>
-                <button id="btnBanker" class="action-btn" onclick="placeBet('BANKER')">BANKER</button>
+                <button id="btnPlayer" class="action-btn" onclick="placeBet('PLAYER')">플레이어</button>
+                <button id="btnTie" class="action-btn" onclick="placeBet('TIE')">타이</button>
+                <button id="btnBanker" class="action-btn" onclick="placeBet('BANKER')">뱅커</button>
             </div>
         </div>
     </div>
 
-    <div class="copyright">© 2025 CAJGHN. All Rights Reserved.</div>
-
     <div id="winOverlay" class="win-overlay">
-        <div id="winTitle" class="win-title">YOU WIN!</div>
+        <div id="winTitle" class="win-title">승리!</div>
         <div id="winAmountDisplay" class="win-amount">+0</div>
-        <div class="click-hint">Click anywhere to close</div>
+        <div class="click-hint">아무 곳이나 클릭하여 닫기</div>
     </div>
 
 <script>
@@ -418,8 +381,8 @@
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
-            alert("Login required.");
-            window.location.href = "casino.html";
+            alert("로그인이 필요합니다.");
+            window.location.href = "https://cajghn.com/casino/";
             return;
         }
 
@@ -527,22 +490,22 @@
 
         const amount = parseInt(inputBet.value);
         if (isNaN(amount) || amount < 100) {
-            alert("Minimum bet is 100.");
+            alert("최소 베팅 금액은 100입니다.");
             return;
         }
 
         const currentTotalBet = bets.PLAYER + bets.TIE + bets.BANKER;
         if (currentTotalBet + amount > balance) {
-            alert("Insufficient balance.");
+            alert("잔액이 부족합니다.");
             return;
         }
 
         if (target === 'PLAYER' && bets['BANKER'] > 0) {
-            alert("You cannot bet on both Player and Banker!");
+            alert("플레이어와 뱅커에 동시에 베팅할 수 없습니다!");
             return;
         }
         if (target === 'BANKER' && bets['PLAYER'] > 0) {
-            alert("You cannot bet on both Player and Banker!");
+            alert("플레이어와 뱅커에 동시에 베팅할 수 없습니다!");
             return;
         }
 
@@ -568,15 +531,20 @@
     }
 
     async function startDeal() {
+        if (gameActive) return;
+
         const totalBet = bets.PLAYER + bets.TIE + bets.BANKER;
         if (totalBet === 0) {
-            alert("Please place a bet first.");
+            alert("먼저 베팅을 해주세요.");
             return;
         }
+        
+        btnDeal.disabled = true;
 
         await fetchBalance();
         if (totalBet > balance) {
-            alert("Insufficient balance.");
+            alert("잔액이 부족합니다.");
+            btnDeal.disabled = false;
             return;
         }
 
@@ -587,18 +555,19 @@
             .eq('id', currentUser.id);
 
         if (error) {
-            alert("Error: " + error.message);
+            alert("오류: " + error.message);
+            btnDeal.disabled = false;
             return;
         }
 
         balance = newBalance;
         gameActive = true;
         
-        btnDeal.disabled = true;
         btnClear.disabled = true;
         btnPlayer.disabled = true;
         btnTie.disabled = true;
         btnBanker.disabled = true;
+        inputBet.disabled = true;
 
         runGameRound();
     }
@@ -705,13 +674,13 @@
         updateUI();
 
         if (totalPayout > totalBetAmount) {
-            elWinTitle.textContent = "YOU WIN!";
+            elWinTitle.textContent = "승리!";
             elWinAmount.textContent = "+" + totalPayout;
             setTimeout(() => {
                 winOverlay.classList.add('show');
             }, 500);
         } else if (totalPayout > 0 && totalPayout === totalBetAmount) {
-            elWinTitle.textContent = "PUSH";
+            elWinTitle.textContent = "무승부";
             elWinAmount.textContent = "+" + totalPayout;
             setTimeout(() => {
                 winOverlay.classList.add('show');
@@ -744,6 +713,7 @@
         btnPlayer.disabled = false;
         btnTie.disabled = false;
         btnBanker.disabled = false;
+        inputBet.disabled = false;
     }
 
     function wait(ms) {
