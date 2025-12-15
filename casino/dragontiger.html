@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAJGHN Casino - Dragon Tiger</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+    :root {
+        --wood-dark: #4a3b30;
+        --wood-medium: #795548;
+        --wood-light: #a1887f;
+        
+        --accent-gold: #d4af37;
+        --accent-gold-shine: #fdd835;
+        
+        --bg-color: #002800; 
+        
+        --red: #c92a2a;
+        --black: #2d2d2d;
+        --green: #0b7285;
+        --card-white: #f0f0f0;
+    }
+
+    * { box-sizing: border-box; user-select: none; }
+    
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        background-color: var(--bg-color);
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+        max-width: 800px;
+        position: relative;
+    }
+
+    .table-section {
+        background: radial-gradient(circle, #003300, #001a00);
+        border: 12px solid var(--wood-medium);
+        border-radius: 20px;
+        box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.5); 
+        padding: 30px;
+        min-height: 400px;
+        display: flex;
+        flex-direction: row; 
+        justify-content: space-between; 
+        align-items: center;
+        gap: 20px;
+        position: relative;
+    }
+
+    .hand-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 140px;
+        width: 45%;
+    }
+
+    .hand-label {
+        color: var(--accent-gold);
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-bottom: 50px; 
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+    
+    .score-num {
+        color: var(--accent-gold);
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-left: 5px;
+        background: transparent;
+        padding: 0;
+        border-radius: 0;
+    }
+
+    .cards-container {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 10px;
+        min-height: 112px; 
+    }
+
+    .card {
+        width: 80px;
+        height: 112px;
+        background-color: var(--card-white);
+        border-radius: 8px;
+        color: black;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        font-size: 1.5rem;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        transition: transform 0.3s ease;
+    }
+
+    .card.red { color: var(--red); }
+    .card.black { color: var(--black); }
+
+    .card-top-left {
+        position: absolute;
+        top: 4px;
+        left: 6px;
+        font-size: 0.9rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 0.8;
+    }
+    
+    .card-center { font-size: 2rem; }
+
+    .betting-board {
+        background: transparent;
+        padding: 20px;
+        width: 100%;
+        color: #ffffff;
+    }
+
+    .info-panel {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        align-items: center;
+        color: #ffffff;
+    }
+    
+    .money-box {
+        background-color: rgba(0,0,0,0.3);
+        color: var(--accent-gold);
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        min-width: 60px;
+        text-align: right;
+        border: 1px solid var(--accent-gold);
+    }
+    .money { color: var(--accent-gold); }
+
+    .controls {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        background: transparent;
+        padding: 15px 0;
+        border-top: 1px solid var(--accent-gold);
+        color: #ffffff;
+    }
+
+    .controls-row-2 {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 0;
+        margin-top: 10px;
+    }
+
+    input[type="number"] {
+        background: rgba(0,0,0,0.3);
+        border: 2px solid var(--accent-gold);
+        color: var(--accent-gold);
+        padding: 8px;
+        border-radius: 6px;
+        width: 80px;
+        text-align: right;
+        font-weight: bold;
+    }
+
+    button.action-btn {
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 1rem;
+        background: transparent;
+        border: 2px solid var(--accent-gold);
+        color: #ffffff;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        box-shadow: none; 
+        flex-grow: 1;
+        position: relative;
+    }
+
+    button.action-btn:hover,
+    button.action-btn:active,
+    button.action-btn:disabled {
+        opacity: 1;
+        background: transparent;
+        border: 2px solid var(--accent-gold);
+        color: #ffffff;
+        cursor: default;
+    }
+    
+    button.action-btn:not(:disabled) {
+        cursor: pointer;
+    }
+
+    .bet-amount-text {
+        position: absolute;
+        bottom: 2px;
+        right: 4px;
+        font-size: 0.7rem;
+        color: var(--accent-gold-shine);
+    }
+
+    .win-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        background-color: rgba(0, 30, 0, 0.95); 
+        cursor: pointer;
+    }
+    .win-overlay.show { 
+        opacity: 1; 
+        pointer-events: auto;
+    }
+    .win-title {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #ffffff; 
+        text-shadow: none; 
+        margin-bottom: 10px;
+    }
+    .win-amount {
+        font-size: 4rem;
+        font-weight: 900;
+        color: var(--accent-gold); 
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .click-hint {
+        margin-top: 20px;
+        color: #ffffff; 
+        font-size: 1rem;
+    }
+
+    @media (max-width: 700px) {
+        .table-section {
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            justify-content: center;
+        }
+        .hand-area {
+            width: 100%;
+        }
+        .card { width: 60px; height: 84px; font-size: 1.2rem; }
+        .controls { flex-wrap: wrap; }
+    }
+</style>
+</head>
+<body>
+
+    <div class="game-container">
+        
+        <div class="table-section">
+            <div class="hand-area">
+                <div class="hand-label">
+                    용 (Dragon) <span id="dragonScore" class="score-num">0</span>
+                </div>
+                <div id="dragonCards" class="cards-container"></div>
+            </div>
+
+            <div class="hand-area">
+                <div class="hand-label">
+                    호 (Tiger) <span id="tigerScore" class="score-num">0</span>
+                </div>
+                <div id="tigerCards" class="cards-container"></div>
+            </div>
+        </div>
+
+        <div class="betting-board">
+            <div class="info-panel">
+                <span>보유 머니: <span class="money-box"><span id="balance" class="money">...</span></span></span>
+                <span>현재 베팅: <span class="money-box"><span id="currentBetDisplay" class="money">0</span></span></span>
+            </div>
+
+            <div class="controls">
+                <div>
+                    <span style="font-size:0.8rem; display:block; margin-bottom:4px; font-weight:bold;">베팅 금액</span>
+                    <input type="number" id="betAmount" value="100" min="100" step="100" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                </div>
+                
+                <button id="btnClear" class="action-btn">초기화</button>
+                <button id="btnDeal" class="action-btn">게임 시작</button>
+            </div>
+
+            <div class="controls-row-2">
+                <button id="btnDragon" class="action-btn" onclick="placeBet('DRAGON')">용</button>
+                <button id="btnTie" class="action-btn" onclick="placeBet('TIE')">타이</button>
+                <button id="btnTiger" class="action-btn" onclick="placeBet('TIGER')">호</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="winOverlay" class="win-overlay">
+        <div id="winTitle" class="win-title">승리!</div>
+        <div id="winAmountDisplay" class="win-amount">+0</div>
+        <div class="click-hint">아무 곳이나 클릭하여 닫기</div>
+    </div>
+
+<script>
+    const SUPABASE_URL = "https://nzdbalmwypdixduickzv.supabase.co"; 
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56ZGJhbG13eXBkaXhkdWlja3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNjc0MjgsImV4cCI6MjA4MDk0MzQyOH0.xskVDK0fIedVzC74bluatdhzXHY8ujKJVCQTiVcy824";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let balance = 0;
+    let bets = { DRAGON: 0, TIE: 0, TIGER: 0 };
+    
+    let deck = [];
+    let dragonHand = [];
+    let tigerHand = [];
+    let deckIndex = 0;
+    let gameActive = false;
+
+    const elBalance = document.getElementById('balance');
+    const elBetDisplay = document.getElementById('currentBetDisplay');
+    const inputBet = document.getElementById('betAmount');
+    
+    const elDragonCards = document.getElementById('dragonCards');
+    const elTigerCards = document.getElementById('tigerCards');
+    const elDragonScore = document.getElementById('dragonScore');
+    const elTigerScore = document.getElementById('tigerScore');
+
+    const btnDeal = document.getElementById('btnDeal');
+    const btnClear = document.getElementById('btnClear');
+    
+    const btnDragon = document.getElementById('btnDragon');
+    const btnTie = document.getElementById('btnTie');
+    const btnTiger = document.getElementById('btnTiger');
+    
+    const winOverlay = document.getElementById('winOverlay');
+    const elWinTitle = document.getElementById('winTitle');
+    const elWinAmount = document.getElementById('winAmountDisplay');
+
+    const SUITS = ['♠', '♥', '♣', '♦'];
+    const VALUES = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+    async function initGame() {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+            alert("로그인이 필요합니다.");
+            window.location.href = "https://cajghn.com/casino/";
+            return;
+        }
+
+        currentUser = session.user;
+        await fetchBalance();
+    }
+
+    async function fetchBalance() {
+        const { data, error } = await supabase
+            .from('users')
+            .select('point')
+            .eq('id', currentUser.id)
+            .single();
+
+        if (data) {
+            balance = data.point;
+            updateUI();
+        }
+    }
+
+    function createDeck() {
+        deck = [];
+        for (let suit of SUITS) {
+            for (let value of VALUES) {
+                deck.push({ suit, value });
+            }
+        }
+        for (let i = 0; i < 3; i++) shuffleDeck();
+        deckIndex = 0;
+    }
+
+    function shuffleDeck() {
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+    }
+
+    function getCard() {
+        if (deckIndex >= deck.length) createDeck(); 
+        return deck[deckIndex++];
+    }
+
+    function getCardValue(card) {
+        if (card.value === 'A') return 1;
+        if (card.value === 'J') return 11;
+        if (card.value === 'Q') return 12;
+        if (card.value === 'K') return 13;
+        return parseInt(card.value);
+    }
+
+    function calculateScore(hand) {
+        if (hand.length === 0) return 0;
+        return getCardValue(hand[0]);
+    }
+
+    function createCardElement(card) {
+        const el = document.createElement('div');
+        el.className = 'card';
+        const isRed = card.suit === '♥' || card.suit === '♦';
+        if (isRed) el.classList.add('red');
+        else el.classList.add('black');
+
+        el.innerHTML = `
+            <div class="card-top-left">
+                <span>${card.value}</span>
+                <span>${card.suit}</span>
+            </div>
+            <div class="card-center">${card.suit}</div>
+        `;
+        return el;
+    }
+
+    function renderHands() {
+        elDragonCards.innerHTML = '';
+        elTigerCards.innerHTML = '';
+
+        dragonHand.forEach(card => elDragonCards.appendChild(createCardElement(card)));
+        tigerHand.forEach(card => elTigerCards.appendChild(createCardElement(card)));
+
+        elDragonScore.textContent = calculateScore(dragonHand);
+        elTigerScore.textContent = calculateScore(tigerHand);
+    }
+    
+    function updateBetButtonText(target) {
+        const btnId = target === 'DRAGON' ? 'btnDragon' : (target === 'TIE' ? 'btnTie' : 'btnTiger');
+        const btn = document.getElementById(btnId);
+        
+        let textEl = btn.querySelector('.bet-amount-text');
+        if (bets[target] > 0) {
+            if (!textEl) {
+                textEl = document.createElement('span');
+                textEl.className = 'bet-amount-text';
+                btn.appendChild(textEl);
+            }
+            textEl.textContent = bets[target];
+        } else {
+            if (textEl) textEl.remove();
+        }
+    }
+
+    function placeBet(target) {
+        if (gameActive) return;
+
+        const amount = parseInt(inputBet.value);
+        if (isNaN(amount) || amount < 100) {
+            alert("최소 베팅 금액은 100입니다.");
+            return;
+        }
+
+        const currentTotalBet = bets.DRAGON + bets.TIE + bets.TIGER;
+        if (currentTotalBet + amount > balance) {
+            alert("잔액이 부족합니다.");
+            return;
+        }
+
+        if (target === 'DRAGON' && bets['TIGER'] > 0) {
+            alert("용과 호에 동시에 베팅할 수 없습니다!");
+            return;
+        }
+        if (target === 'TIGER' && bets['DRAGON'] > 0) {
+            alert("용과 호에 동시에 베팅할 수 없습니다!");
+            return;
+        }
+
+        bets[target] += amount;
+        updateUI();
+        updateBetButtonText(target);
+    }
+
+    function clearBets() {
+        if (gameActive) return;
+        bets = { DRAGON: 0, TIE: 0, TIGER: 0 };
+        
+        updateBetButtonText('DRAGON');
+        updateBetButtonText('TIE');
+        updateBetButtonText('TIGER');
+        updateUI();
+    }
+
+    function updateUI() {
+        const totalBet = bets.DRAGON + bets.TIE + bets.TIGER;
+        elBalance.textContent = Math.floor(balance - totalBet); 
+        elBetDisplay.textContent = totalBet;
+    }
+
+    async function startDeal() {
+        if (gameActive) return;
+
+        const totalBet = bets.DRAGON + bets.TIE + bets.TIGER;
+        if (totalBet === 0) {
+            alert("먼저 베팅을 해주세요.");
+            return;
+        }
+
+        btnDeal.disabled = true;
+
+        await fetchBalance();
+        if (totalBet > balance) {
+            alert("잔액이 부족합니다.");
+            btnDeal.disabled = false;
+            return;
+        }
+
+        const newBalance = balance - totalBet;
+        const { error } = await supabase
+            .from('users')
+            .update({ point: newBalance })
+            .eq('id', currentUser.id);
+
+        if (error) {
+            alert("오류: " + error.message);
+            btnDeal.disabled = false;
+            return;
+        }
+
+        balance = newBalance;
+        gameActive = true;
+        
+        btnClear.disabled = true;
+        btnDragon.disabled = true;
+        btnTie.disabled = true;
+        btnTiger.disabled = true;
+        inputBet.disabled = true;
+
+        runGameRound();
+    }
+
+    async function runGameRound() {
+        dragonHand = [];
+        tigerHand = [];
+        renderHands();
+
+        if (deck.length < 10) createDeck(); 
+
+        await wait(500);
+        dragonHand.push(getCard());
+        renderHands();
+        
+        await wait(500);
+        tigerHand.push(getCard());
+        renderHands();
+        
+        await wait(800);
+        finalizeGame();
+    }
+
+    async function finalizeGame() {
+        const dScore = calculateScore(dragonHand);
+        const tScore = calculateScore(tigerHand);
+        
+        let winner = 'TIE';
+        if (dScore > tScore) winner = 'DRAGON';
+        else if (tScore > dScore) winner = 'TIGER';
+
+        let totalPayout = 0;
+        const totalBetAmount = bets.DRAGON + bets.TIE + bets.TIGER;
+
+        if (winner === 'TIE') {
+            if (bets.TIE > 0) totalPayout += bets.TIE * 9;
+            if (bets.DRAGON > 0) totalPayout += bets.DRAGON / 2;
+            if (bets.TIGER > 0) totalPayout += bets.TIGER / 2;
+        } else if (winner === 'DRAGON') {
+             if (bets.DRAGON > 0) totalPayout += bets.DRAGON * 2;
+        } else if (winner === 'TIGER') {
+             if (bets.TIGER > 0) totalPayout += bets.TIGER * 2;
+        }
+
+        totalPayout = Math.floor(totalPayout);
+        if (totalPayout > 0) {
+            const newBalance = balance + totalPayout;
+            await supabase
+                .from('users')
+                .update({ point: newBalance })
+                .eq('id', currentUser.id);
+            balance = newBalance;
+        }
+
+        bets = { DRAGON: 0, TIE: 0, TIGER: 0 };
+        updateUI();
+
+        if (winner !== 'TIE' && totalPayout > totalBetAmount) {
+            elWinTitle.textContent = "승리!";
+            elWinAmount.textContent = "+" + totalPayout;
+            setTimeout(() => {
+                winOverlay.classList.add('show');
+            }, 500);
+        } else if (winner === 'TIE') {
+            elWinTitle.textContent = "무승부";
+            elWinAmount.textContent = "+" + totalPayout;
+            setTimeout(() => {
+                winOverlay.classList.add('show');
+            }, 500);
+        } else {
+            setTimeout(resetGameRound, 1500);
+        }
+        
+        gameActive = false;
+    }
+
+    function resetGameRound() {
+        winOverlay.classList.remove('show');
+        
+        dragonHand = [];
+        tigerHand = [];
+        elDragonCards.innerHTML = '';
+        elTigerCards.innerHTML = '';
+        elDragonScore.textContent = '0';
+        elTigerScore.textContent = '0';
+
+        bets = { DRAGON: 0, TIE: 0, TIGER: 0 };
+        updateBetButtonText('DRAGON');
+        updateBetButtonText('TIE');
+        updateBetButtonText('TIGER');
+        updateUI();
+
+        btnDeal.disabled = false;
+        btnClear.disabled = false;
+        btnDragon.disabled = false;
+        btnTie.disabled = false;
+        btnTiger.disabled = false;
+        inputBet.disabled = false;
+    }
+
+    function wait(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    createDeck();
+    initGame();
+    
+    btnDeal.addEventListener('click', startDeal);
+    btnClear.addEventListener('click', clearBets);
+    winOverlay.addEventListener('click', resetGameRound);
+
+</script>
+</body>
+</html>

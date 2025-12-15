@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAJGHN Casino - Video Poker</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+    :root {
+        --wood-dark: #4a3b30;
+        --wood-medium: #795548;
+        --wood-light: #a1887f;
+        
+        --accent-gold: #d4af37;
+        --accent-gold-shine: #fdd835;
+        
+        --bg-color: #002800; 
+        
+        --red: #c92a2a;
+        --black: #2d2d2d;
+        --green: #0b7285;
+        --card-white: #f0f0f0;
+    }
+
+    * { box-sizing: border-box; user-select: none; }
+    
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        background-color: var(--bg-color);
+        color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+        max-width: 900px;
+        position: relative;
+    }
+
+    .paytable {
+        background: rgba(0, 0, 0, 0.5);
+        border: 2px solid var(--accent-gold);
+        border-radius: 10px;
+        padding: 10px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        font-size: 0.8rem;
+        text-align: center;
+    }
+
+    .pay-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 2px 5px;
+    }
+
+    .pay-name { color: #ddd; }
+    .pay-val { color: var(--accent-gold); font-weight: bold; }
+    .pay-item.highlight { background-color: var(--accent-gold); }
+    .pay-item.highlight .pay-name, .pay-item.highlight .pay-val { color: #000; }
+
+    .table-section {
+        background: radial-gradient(circle, #003300, #001a00);
+        border: 12px solid var(--wood-medium);
+        border-radius: 20px;
+        box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 10px 20px rgba(0,0,0,0.5); 
+        padding: 30px;
+        min-height: 350px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
+    .cards-container {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .card-wrapper {
+        position: relative;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .card-wrapper:hover {
+        transform: translateY(-5px);
+    }
+
+    .card {
+        width: 90px;
+        height: 126px;
+        background-color: var(--card-white);
+        border-radius: 8px;
+        color: black;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        font-size: 1.8rem;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    }
+
+    .card.red { color: var(--red); }
+    .card.black { color: var(--black); }
+
+    .card-top-left {
+        position: absolute;
+        top: 4px;
+        left: 6px;
+        font-size: 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 0.8;
+    }
+    
+    .card-center { font-size: 2.5rem; }
+
+    .card.back {
+        background-color: var(--red);
+        border: 2px solid white;
+    }
+    .card.back .card-top-left, .card.back .card-center { display: none; }
+
+    .hold-label {
+        position: absolute;
+        top: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: var(--accent-gold);
+        color: #000;
+        font-weight: bold;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        display: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+
+    .card-wrapper.held .hold-label {
+        display: block;
+    }
+    .card-wrapper.held .card {
+        border: 3px solid var(--accent-gold);
+        box-shadow: 0 0 10px var(--accent-gold);
+    }
+
+    .betting-board {
+        background: transparent;
+        padding: 20px;
+        width: 100%;
+        color: #ffffff;
+    }
+
+    .info-panel {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        align-items: center;
+        color: #ffffff;
+    }
+    
+    .money-box {
+        background-color: rgba(0,0,0,0.3);
+        color: var(--accent-gold);
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        min-width: 60px;
+        text-align: right;
+        border: 1px solid var(--accent-gold);
+    }
+    .money { color: var(--accent-gold); }
+
+    .controls {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        background: transparent;
+        padding: 15px 0;
+        border-top: 1px solid var(--accent-gold);
+        color: #ffffff;
+    }
+
+    input[type="number"] {
+        background: rgba(0,0,0,0.3);
+        border: 2px solid var(--accent-gold);
+        color: var(--accent-gold);
+        padding: 8px;
+        border-radius: 6px;
+        width: 80px;
+        text-align: right;
+        font-weight: bold;
+    }
+
+    button.action-btn {
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        text-transform: uppercase;
+        font-size: 1rem;
+        background: transparent;
+        border: 2px solid var(--accent-gold);
+        color: #ffffff;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        box-shadow: none; 
+        flex-grow: 1;
+        position: relative;
+    }
+
+    button.action-btn:hover,
+    button.action-btn:active,
+    button.action-btn:disabled {
+        opacity: 1;
+        background: transparent;
+        border: 2px solid var(--accent-gold);
+        color: #ffffff;
+        cursor: default;
+    }
+    
+    button.action-btn:not(:disabled) {
+        cursor: pointer;
+    }
+
+    button.action-btn:disabled {
+        opacity: 0.5;
+        border-color: #777;
+    }
+
+    .win-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        background-color: rgba(0, 30, 0, 0.95); 
+        cursor: pointer;
+    }
+    .win-overlay.show { 
+        opacity: 1; 
+        pointer-events: auto;
+    }
+    .win-title {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #ffffff; 
+        text-shadow: none; 
+        margin-bottom: 10px;
+    }
+    .win-hand {
+        font-size: 2rem;
+        color: #ffffff;
+        margin-bottom: 5px;
+    }
+    .win-amount {
+        font-size: 4rem;
+        font-weight: 900;
+        color: var(--accent-gold); 
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .click-hint {
+        margin-top: 20px;
+        color: #ffffff; 
+        font-size: 1rem;
+    }
+
+    @media (max-width: 700px) {
+        .paytable { grid-template-columns: repeat(2, 1fr); font-size: 0.7rem; }
+        .card { width: 60px; height: 84px; font-size: 1.2rem; }
+        .card-center { font-size: 1.5rem; }
+        .hold-label { font-size: 0.7rem; top: -20px; }
+        .controls { flex-wrap: wrap; }
+    }
+</style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div class="paytable" id="paytable">
+            <div class="pay-item" id="pt-rf"><span class="pay-name">로얄 플러시</span><span class="pay-val">250</span></div>
+            <div class="pay-item" id="pt-sf"><span class="pay-name">스트레이트 플러시</span><span class="pay-val">50</span></div>
+            <div class="pay-item" id="pt-4k"><span class="pay-name">포 카드</span><span class="pay-val">25</span></div>
+            <div class="pay-item" id="pt-fh"><span class="pay-name">풀 하우스</span><span class="pay-val">9</span></div>
+            <div class="pay-item" id="pt-fl"><span class="pay-name">플러시</span><span class="pay-val">6</span></div>
+            <div class="pay-item" id="pt-st"><span class="pay-name">스트레이트</span><span class="pay-val">4</span></div>
+            <div class="pay-item" id="pt-3k"><span class="pay-name">트리플</span><span class="pay-val">3</span></div>
+            <div class="pay-item" id="pt-2p"><span class="pay-name">투 페어</span><span class="pay-val">2</span></div>
+            <div class="pay-item" id="pt-jb"><span class="pay-name">잭스 오어 베터</span><span class="pay-val">1</span></div>
+        </div>
+
+        <div class="table-section">
+            <div id="cardsArea" class="cards-container">
+                <div class="card back"></div>
+                <div class="card back"></div>
+                <div class="card back"></div>
+                <div class="card back"></div>
+                <div class="card back"></div>
+            </div>
+        </div>
+
+        <div class="betting-board">
+            <div class="info-panel">
+                <span>보유 머니: <span class="money-box"><span id="balance" class="money">...</span></span></span>
+                <span>현재 베팅: <span class="money-box"><span id="currentBetDisplay" class="money">0</span></span></span>
+            </div>
+
+            <div class="controls">
+                <div>
+                    <span style="font-size:0.8rem; display:block; margin-bottom:4px; font-weight:bold;">베팅 금액</span>
+                    <input type="number" id="betAmount" value="100" min="100" step="100" onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                </div>
+                
+                <button id="btnAction" class="action-btn">딜</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="winOverlay" class="win-overlay">
+        <div id="winTitle" class="win-title">승리!</div>
+        <div id="winHandName" class="win-hand"></div>
+        <div id="winAmountDisplay" class="win-amount">+0</div>
+        <div class="click-hint">아무 곳이나 클릭하여 닫기</div>
+    </div>
+
+<script>
+    const SUPABASE_URL = "https://nzdbalmwypdixduickzv.supabase.co"; 
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56ZGJhbG13eXBkaXhkdWlja3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNjc0MjgsImV4cCI6MjA4MDk0MzQyOH0.xskVDK0fIedVzC74bluatdhzXHY8ujKJVCQTiVcy824";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let balance = 0;
+    let currentBet = 0;
+    
+    let deck = [];
+    let hand = [];
+    let held = [false, false, false, false, false];
+    let deckIndex = 0;
+    
+    let gameState = 'BET'; 
+
+    const elBalance = document.getElementById('balance');
+    const elBetDisplay = document.getElementById('currentBetDisplay');
+    const inputBet = document.getElementById('betAmount');
+    const elCardsArea = document.getElementById('cardsArea');
+    const btnAction = document.getElementById('btnAction');
+    
+    const winOverlay = document.getElementById('winOverlay');
+    const elWinTitle = document.getElementById('winTitle');
+    const elWinHandName = document.getElementById('winHandName');
+    const elWinAmount = document.getElementById('winAmountDisplay');
+
+    const SUITS = ['♠', '♥', '♣', '♦'];
+    const VALUES = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+
+    async function initGame() {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+            alert("로그인이 필요합니다.");
+            window.location.href = "https://cajghn.com/casino/";
+            return;
+        }
+
+        currentUser = session.user;
+        await fetchBalance();
+    }
+
+    async function fetchBalance() {
+        const { data, error } = await supabase
+            .from('users')
+            .select('point')
+            .eq('id', currentUser.id)
+            .single();
+
+        if (data) {
+            balance = data.point;
+            updateUI();
+        }
+    }
+
+    function updateUI() {
+        elBalance.textContent = balance.toLocaleString();
+        elBetDisplay.textContent = currentBet.toLocaleString();
+    }
+
+    function createDeck() {
+        deck = [];
+        for (let suit of SUITS) {
+            for (let value of VALUES) {
+                deck.push({ suit, value });
+            }
+        }
+        for (let i = 0; i < 3; i++) shuffleDeck();
+        deckIndex = 0;
+    }
+
+    function shuffleDeck() {
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+    }
+
+    function getCard() {
+        if (deckIndex >= deck.length) createDeck(); 
+        return deck[deckIndex++];
+    }
+
+    function getCardValue(card) {
+        if (card.value === 'A') return 14;
+        if (card.value === 'K') return 13;
+        if (card.value === 'Q') return 12;
+        if (card.value === 'J') return 11;
+        return parseInt(card.value);
+    }
+
+    function createCardElement(card, index) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card-wrapper';
+        if (held[index]) wrapper.classList.add('held');
+        
+        wrapper.onclick = () => toggleHold(index);
+
+        const holdLabel = document.createElement('div');
+        holdLabel.className = 'hold-label';
+        holdLabel.textContent = 'HOLD';
+        wrapper.appendChild(holdLabel);
+
+        const el = document.createElement('div');
+        el.className = 'card';
+        const isRed = card.suit === '♥' || card.suit === '♦';
+        if (isRed) el.classList.add('red');
+        else el.classList.add('black');
+
+        el.innerHTML = `
+            <div class="card-top-left">
+                <span>${card.value}</span>
+                <span>${card.suit}</span>
+            </div>
+            <div class="card-center">${card.suit}</div>
+        `;
+        wrapper.appendChild(el);
+        return wrapper;
+    }
+
+    function renderHand() {
+        elCardsArea.innerHTML = '';
+        hand.forEach((card, index) => {
+            elCardsArea.appendChild(createCardElement(card, index));
+        });
+    }
+
+    function toggleHold(index) {
+        if (gameState !== 'DRAW') return;
+        held[index] = !held[index];
+        renderHand();
+    }
+
+    async function handleAction() {
+        if (gameState === 'BET') {
+            await startDeal();
+        } else if (gameState === 'DRAW') {
+            await drawCards();
+        } else {
+            resetGame();
+        }
+    }
+
+    async function startDeal() {
+        btnAction.disabled = true;
+        await fetchBalance();
+        
+        const amount = parseInt(inputBet.value);
+        if (isNaN(amount) || amount < 100) {
+            alert("최소 베팅 금액은 100입니다.");
+            btnAction.disabled = false;
+            return;
+        }
+        if (amount > balance) {
+            alert("잔액이 부족합니다.");
+            btnAction.disabled = false;
+            return;
+        }
+
+        const newBalance = balance - amount;
+        const { error } = await supabase
+            .from('users')
+            .update({ point: newBalance })
+            .eq('id', currentUser.id);
+
+        if (error) {
+            alert("오류: " + error.message);
+            btnAction.disabled = false;
+            return;
+        }
+
+        balance = newBalance;
+        currentBet = amount;
+        updateUI();
+
+        createDeck();
+        hand = [];
+        held = [false, false, false, false, false];
+        
+        for (let i = 0; i < 5; i++) hand.push(getCard());
+        
+        gameState = 'DRAW';
+        renderHand();
+        
+        inputBet.disabled = true;
+        btnAction.textContent = "드로우";
+        btnAction.disabled = false;
+        
+        document.querySelectorAll('.pay-item').forEach(el => el.classList.remove('highlight'));
+    }
+
+    async function drawCards() {
+        btnAction.disabled = true;
+        
+        for (let i = 0; i < 5; i++) {
+            if (!held[i]) {
+                hand[i] = getCard();
+            }
+        }
+        renderHand();
+        
+        const result = evaluateHand(hand);
+        let winnings = 0;
+        
+        if (result.multiplier > 0) {
+            winnings = currentBet * result.multiplier;
+            const newBalance = balance + winnings;
+            await supabase
+                .from('users')
+                .update({ point: newBalance })
+                .eq('id', currentUser.id);
+            balance = newBalance;
+            
+            const ptId = getPaytableId(result.rank);
+            if (ptId) document.getElementById(ptId).classList.add('highlight');
+            
+            setTimeout(() => {
+                elWinTitle.textContent = "승리!";
+                elWinHandName.textContent = result.name;
+                elWinAmount.textContent = "+" + winnings;
+                winOverlay.classList.add('show');
+            }, 500);
+        } else {
+            setTimeout(resetGame, 1000);
+        }
+
+        updateUI();
+        gameState = 'RESULT';
+    }
+
+    function getPaytableId(rank) {
+        switch(rank) {
+            case 9: return 'pt-rf';
+            case 8: return 'pt-sf';
+            case 7: return 'pt-4k';
+            case 6: return 'pt-fh';
+            case 5: return 'pt-fl';
+            case 4: return 'pt-st';
+            case 3: return 'pt-3k';
+            case 2: return 'pt-2p';
+            case 1: return 'pt-jb';
+            default: return null;
+        }
+    }
+
+    function resetGame() {
+        winOverlay.classList.remove('show');
+        gameState = 'BET';
+        currentBet = 0;
+        updateUI();
+        
+        elCardsArea.innerHTML = `
+            <div class="card back"></div>
+            <div class="card back"></div>
+            <div class="card back"></div>
+            <div class="card back"></div>
+            <div class="card back"></div>
+        `;
+        
+        btnAction.textContent = "딜";
+        btnAction.disabled = false;
+        inputBet.disabled = false;
+        document.querySelectorAll('.pay-item').forEach(el => el.classList.remove('highlight'));
+    }
+
+    function evaluateHand(hand) {
+        const values = hand.map(getCardValue).sort((a, b) => a - b);
+        const suits = hand.map(c => c.suit);
+        
+        const isFlush = suits.every(s => s === suits[0]);
+        
+        let isStraight = true;
+        for (let i = 0; i < 4; i++) {
+            if (values[i] + 1 !== values[i+1]) isStraight = false;
+        }
+        
+        if (!isStraight && values.join(',') === '2,3,4,5,14') { 
+            isStraight = true; 
+        }
+
+        const counts = {};
+        values.forEach(v => counts[v] = (counts[v] || 0) + 1);
+        const countValues = Object.values(counts);
+        
+        if (isFlush && isStraight) {
+            if (values[0] === 10 && values[4] === 14) return { multiplier: 250, name: '로얄 플러시', rank: 9 };
+            return { multiplier: 50, name: '스트레이트 플러시', rank: 8 };
+        }
+        if (countValues.includes(4)) return { multiplier: 25, name: '포 카드', rank: 7 };
+        if (countValues.includes(3) && countValues.includes(2)) return { multiplier: 9, name: '풀 하우스', rank: 6 };
+        if (isFlush) return { multiplier: 6, name: '플러시', rank: 5 };
+        if (isStraight) return { multiplier: 4, name: '스트레이트', rank: 4 };
+        if (countValues.includes(3)) return { multiplier: 3, name: '트리플', rank: 3 };
+        if (countValues.filter(c => c === 2).length === 2) return { multiplier: 2, name: '투 페어', rank: 2 };
+        
+        if (countValues.includes(2)) {
+            const pairVal = parseInt(Object.keys(counts).find(key => counts[key] === 2));
+            if (pairVal >= 11) return { multiplier: 1, name: '잭스 오어 베터', rank: 1 };
+        }
+
+        return { multiplier: 0, name: '', rank: 0 };
+    }
+
+    createDeck();
+    initGame();
+    
+    btnAction.addEventListener('click', handleAction);
+    winOverlay.addEventListener('click', resetGame);
+
+</script>
+</body>
+</html>
