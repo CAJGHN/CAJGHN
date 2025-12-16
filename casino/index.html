@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CAJGHN Casino</title>
+    <title>CAJGHN CASINO</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -303,13 +303,13 @@
         
         <div class="header-right">
             <div id="user-info-text" class="info-group">
-                <div><span id="user-name">-</span> 님</div>
-                <div>Points: <span id="user-point">0</span></div>
+                <div>USER: <span id="user-name">-</span></div>
+                <div>POINTS: <span id="user-point">0</span></div>
             </div>
 
             <div class="btn-group">
-                <button id="btn-left" class="action-btn" onclick="clickLeftBtn()">로그인</button>
-                <button id="btn-right" class="action-btn" onclick="clickRightBtn()">회원가입</button>
+                <button id="btn-left" class="action-btn" onclick="clickLeftBtn()">LOGIN</button>
+                <button id="btn-right" class="action-btn" onclick="clickRightBtn()">SIGN UP</button>
             </div>
         </div>
     </header>
@@ -323,79 +323,47 @@
             <div class="game-grid">
                 <div class="game-card" onclick="moveGame('blackjack.html')">
                     <div class="game-name">Blackjack</div>
-                    <div class="game-desc">딜러를 이겨라</div>
+                    <div class="game-desc">Beat the Dealer</div>
                 </div>
                 <div class="game-card" onclick="moveGame('baccarat.html')">
                     <div class="game-name">Baccarat</div>
-                    <div class="game-desc">플레이어 vs 뱅커</div>
+                    <div class="game-desc">Player vs Banker</div>
                 </div>
                 <div class="game-card" onclick="moveGame('dragontiger.html')">
                     <div class="game-name">Dragon Tiger</div>
-                    <div class="game-desc">용호상박</div>
+                    <div class="game-desc">Dragon vs Tiger</div>
                 </div>
                 <div class="game-card" onclick="moveGame('videopoker.html')">
                     <div class="game-name">Video Poker</div>
-                    <div class="game-desc">최고의 족보를 완성하라</div>
+                    <div class="game-desc">Build the Best Hand</div>
                 </div>
                 <div class="game-card" onclick="moveGame('highlow.html')">
                     <div class="game-name">High Low</div>
-                    <div class="game-desc">더 높은 카드를 예측하라</div>
+                    <div class="game-desc">Higher or Lower?</div>
                 </div>
             </div>
         </div>
 
         <div class="category-block">
             <div class="category-header">
-                <div class="category-title">Table & Dice</div>
+                <div class="category-title">Table</div>
             </div>
             <div class="game-grid">
                 <div class="game-card" onclick="moveGame('roulette.html')">
                     <div class="game-name">Roulette</div>
-                    <div class="game-desc">행운의 숫자를 맞춰라</div>
-                </div>
-                <div class="game-card" onclick="moveGame('sicbo.html')">
-                    <div class="game-name">Sic Bo</div>
-                    <div class="game-desc">주사위 3개의 합</div>
-                </div>
-                <div class="game-card" onclick="moveGame('bigwheel.html')">
-                    <div class="game-name">Big Wheel</div>
-                    <div class="game-desc">회전판의 행운</div>
-                </div>
-                <div class="game-card" onclick="moveGame('craps.html')">
-                    <div class="game-name">Craps</div>
-                    <div class="game-desc">주사위의 열기</div>
-                </div>
-                <div class="game-card" onclick="moveGame('dice.html')">
-                    <div class="game-name">Dice</div>
-                    <div class="game-desc">숫자를 맞춰라</div>
+                    <div class="game-desc">Spin the Wheel</div>
                 </div>
             </div>
         </div>
 
         <div class="category-block">
             <div class="category-header">
-                <div class="category-title">Arcade & Slots</div>
+                <div class="category-title">Slots</div>
             </div>
             <div class="game-grid">
-                <div class="game-card" onclick="moveGame('slot.html')">
-                    <div class="game-name">Slot</div>
-                    <div class="game-desc">잭팟을 노려라</div>
-                </div>
-                <div class="game-card" onclick="moveGame('keno.html')">
-                    <div class="game-name">Keno</div>
-                    <div class="game-desc">행운의 볼 추첨</div>
-                </div>
-                <div class="game-card" onclick="moveGame('pachinko.html')">
-                    <div class="game-name">Pachinko</div>
-                    <div class="game-desc">구슬의 향연</div>
-                </div>
-                <div class="game-card" onclick="moveGame('pinball.html')">
-                    <div class="game-name">Pinball</div>
-                    <div class="game-desc">점수를 획득하라</div>
-                </div>
-                <div class="game-card" onclick="moveGame('rocket.html')">
-                    <div class="game-name">Rocket</div>
-                    <div class="game-desc">타이밍이 생명</div>
+                <div class="game-card" onclick="moveGame('triplefruits.html')">
+                    <div class="game-name">TRIPLE FRUITS</div>
+                    <div class="game-desc">Hit the Jackpot</div>
                 </div>
             </div>
         </div>
@@ -404,23 +372,23 @@
 
     <div id="login-modal" class="modal-overlay">
         <div class="modal-box">
-            <h2>로그인</h2>
-            <input type="text" id="login-id" placeholder="아이디">
-            <input type="password" id="login-pw" placeholder="비밀번호">
-            <button class="btn-full" onclick="processLogin()">로그인</button>
-            <button class="btn-full" onclick="closeModal()">닫기</button>
+            <h2>LOGIN</h2>
+            <input type="text" id="login-id" placeholder="ID">
+            <input type="password" id="login-pw" placeholder="Password">
+            <button class="btn-full" onclick="processLogin()">LOGIN</button>
+            <button class="btn-full" onclick="closeModal()">CLOSE</button>
         </div>
     </div>
 
     <div id="join-modal" class="modal-overlay">
         <div class="modal-box">
-            <h2>회원가입</h2>
-            <input type="text" id="join-id" placeholder="아이디 (영어)">
-            <input type="password" id="join-pw" placeholder="비밀번호 (6자 이상)">
-            <input type="password" id="join-pw-confirm" placeholder="비밀번호 확인">
-            <input type="text" id="join-name" placeholder="닉네임 (한글)">
-            <button class="btn-full" onclick="processJoin()">회원가입</button>
-            <button class="btn-full" onclick="closeModal()">취소</button>
+            <h2>SIGN UP</h2>
+            <input type="text" id="join-id" placeholder="ID">
+            <input type="password" id="join-pw" placeholder="Password (6+ chars)">
+            <input type="password" id="join-pw-confirm" placeholder="Confirm Password">
+            <input type="text" id="join-name" placeholder="Nickname">
+            <button class="btn-full" onclick="processJoin()">SIGN UP</button>
+            <button class="btn-full" onclick="closeModal()">CLOSE</button>
         </div>
     </div>
 
@@ -450,7 +418,7 @@
 
         function moveGame(url) {
             if (!currentUser) {
-                alert("로그인 후 이용 가능합니다.");
+                alert("Please login to play.");
                 return;
             }
             location.href = url;
@@ -459,7 +427,7 @@
         function clickLeftBtn() {
             if (currentUser) {
                 fetchUserPoint();
-                alert("잔액 정보를 새로 가져왔습니다.");
+                alert("User info refreshed.");
             } else {
                 openModal('login-modal');
             }
@@ -476,12 +444,12 @@
         function updateHeaderUI(isLoggedIn) {
             if (isLoggedIn) {
                 userInfoText.style.display = "flex"; 
-                btnLeft.innerText = "새로고침";
-                btnRight.innerText = "로그아웃";
+                btnLeft.innerText = "REFRESH";
+                btnRight.innerText = "LOGOUT";
             } else {
                 userInfoText.style.display = "none";
-                btnLeft.innerText = "로그인";
-                btnRight.innerText = "회원가입";
+                btnLeft.innerText = "LOGIN";
+                btnRight.innerText = "SIGN UP";
                 document.getElementById('user-name').innerText = "-";
                 document.getElementById('user-point').innerText = "0";
             }
@@ -502,15 +470,15 @@
             const pw2 = document.getElementById('join-pw-confirm').value.trim();
             const name = document.getElementById('join-name').value.trim();
 
-            if (!id || !name) return alert("빈칸을 채워주세요.");
-            if (pw !== pw2) return alert("비밀번호 불일치");
-            if (pw.length < 6) return alert("비밀번호 6자 이상");
+            if (!id || !name) return alert("Please fill in all fields.");
+            if (pw !== pw2) return alert("Passwords do not match.");
+            if (pw.length < 6) return alert("Password must be at least 6 characters.");
 
             const { data: idData } = await supabase.from('users').select('real_id').eq('real_id', id);
-            if (idData?.length > 0) return alert("이미 있는 아이디입니다.");
+            if (idData?.length > 0) return alert("ID already exists.");
 
             const { data: nameData } = await supabase.from('users').select('name').eq('name', name);
-            if (nameData?.length > 0) return alert("이미 있는 닉네임입니다.");
+            if (nameData?.length > 0) return alert("Nickname already exists.");
 
             const { data, error } = await supabase.auth.signUp({
                 email: id + FAKE_DOMAIN,
@@ -524,12 +492,12 @@
             });
             
             if (error) {
-                return alert("가입 실패: " + error.message);
+                return alert("Sign up failed: " + error.message);
             }
 
             await supabase.auth.signOut(); 
             
-            alert("회원가입 완료! 로그인 해주세요.");
+            alert("Sign up complete! Please login.");
             closeModal();
         }
 
@@ -542,7 +510,7 @@
                 password: pw
             });
 
-            if (error) return alert("정보가 틀렸습니다.");
+            if (error) return alert("Invalid credentials.");
             closeModal();
         }
 
@@ -557,7 +525,7 @@
 
         async function logout() {
             await supabase.auth.signOut();
-            alert("로그아웃 되었습니다.");
+            alert("Logged out.");
             location.reload(); 
         }
     </script>
