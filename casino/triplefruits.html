@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>TRIPLE FRUITS</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
     :root {
         --bg: #0A0A14;
@@ -19,18 +20,25 @@
         padding: 0;
         box-sizing: border-box;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
     }
 
     body {
         background: var(--bg);
         color: var(--text);
-        overflow-x: hidden;
+        overflow: hidden;
         line-height: 1.6;
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
         padding: 20px;
+        overscroll-behavior: none;
+        cursor: default;
     }
 
     .game-container {
@@ -102,7 +110,7 @@
     .stat-box { 
         display: flex;
         flex-direction: column;
-        align-items: center;     
+        align-items: center;      
         justify-content: center; 
         min-width: 100px;
     }
@@ -113,7 +121,7 @@
         font-weight: 600; 
         letter-spacing: 1px; 
         margin-bottom: 4px;
-        text-align: center;      
+        text-align: center;       
     }
 
     .stat-value { 
@@ -128,7 +136,7 @@
     .bet-container { 
         display: flex; 
         flex-direction: column; 
-        align-items: center;     
+        align-items: center;      
         justify-content: center; 
     }
 
@@ -158,7 +166,7 @@
 
     .btn-simple:hover:not(:disabled) { color: var(--accent); }
     .btn-simple:active:not(:disabled) { transform: scale(0.9); }
-    .btn-simple:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn-simple:disabled { opacity: 1; cursor: default; }
 
     .btn-spin {
         display: block;
@@ -175,6 +183,7 @@
         transition: var(--transition);
         cursor: pointer;
         box-shadow: none; 
+        outline: none;
     }
 
     .btn-spin:hover:not(:disabled) {
@@ -239,16 +248,16 @@
         <div class="dashboard">
             <div class="stat-box">
                 <div class="stat-label">POINTS</div>
-                <div class="stat-value" id="pointDisplay">10000</div>
+                <div class="stat-value" id="pointDisplay">0</div>
             </div>
 
             <div class="controls">
                 <div class="bet-container">
                     <div class="stat-label">BET</div>
                     <div class="bet-row">
-                        <button class="btn-simple" onclick="adjustBet(-100)">-</button>
+                        <button class="btn-simple" id="btnMinus" onclick="adjustBet(-100)">-</button>
                         <div class="bet-val" id="betDisplay">100</div>
-                        <button class="btn-simple" onclick="adjustBet(100)">+</button>
+                        <button class="btn-simple" id="btnPlus" onclick="adjustBet(100)">+</button>
                     </div>
                 </div>
                 <button class="btn-spin" id="spinBtn" onclick="spin()">SPIN</button>
@@ -258,6 +267,15 @@
     </div>
 
 <script>
+    const SUPABASE_URL = "https://nzdbalmwypdixduickzv.supabase.co"; 
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56ZGJhbG13eXBkaXhkdWlja3p2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUzNjc0MjgsImV4cCI6MjA4MDk0MzQyOH0.xskVDK0fIedVzC74bluatdhzXHY8ujKJVCQTiVcy824";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let points = 0;
+    let bet = 100;
+    let isSpinning = false;
+
     const symbolTypes = [
         { id: '🍒', val: 10 },
         { id: '🍋', val: 20 },
@@ -266,13 +284,11 @@
         { id: '7', val: 77, customClass: 'sym-seven' }
     ];
 
-    let points = 10000;
-    let bet = 100;
-    let isSpinning = false;
-
     const elPoints = document.getElementById('pointDisplay');
     const elBet = document.getElementById('betDisplay');
     const elSpinBtn = document.getElementById('spinBtn');
+    const elBtnMinus = document.getElementById('btnMinus');
+    const elBtnPlus = document.getElementById('btnPlus');
     
     const reelHeight = 240; 
     const reels = [
@@ -280,6 +296,35 @@
         document.getElementById('reel2'),
         document.getElementById('reel3')
     ];
+
+    async function initGame() {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+            alert("Login Required.");
+            window.location.href = "https://cajghn.com/casino/";
+            return;
+        }
+
+        currentUser = session.user;
+        await fetchBalance();
+
+        reels.forEach(r => initReel(r));
+        updateUI();
+    }
+
+    async function fetchBalance() {
+        const { data, error } = await supabase
+            .from('users')
+            .select('point')
+            .eq('id', currentUser.id)
+            .single();
+
+        if (data) {
+            points = data.point;
+            updateUI();
+        }
+    }
 
     function initReel(element) {
         let html = '';
@@ -300,15 +345,10 @@
         return `<div class="symbol ${extraClass}" data-id="${sym.id}">${sym.id}</div>`;
     }
 
-    function initGame() {
-        reels.forEach(r => initReel(r));
-        updateUI();
-    }
-
     function adjustBet(amount) {
         if(isSpinning) return;
         const newBet = bet + amount;
-        if(newBet >= 100 && newBet <= points) {
+        if(newBet >= 100) {
             bet = newBet;
             updateUI();
         }
@@ -319,16 +359,32 @@
         elBet.innerText = bet;
     }
 
-    function spin() {
+    async function spin() {
         if(isSpinning) return;
+
+        await fetchBalance();
+
         if(points < bet) {
             alert("Insufficient Points!");
             return;
         }
 
-        points -= bet;
+        const newBalance = points - bet;
+        const { error } = await supabase
+            .from('users')
+            .update({ point: newBalance })
+            .eq('id', currentUser.id);
+
+        if (error) {
+            alert("Error updating balance.");
+            return;
+        }
+
+        points = newBalance;
         isSpinning = true;
         elSpinBtn.disabled = true;
+        elBtnMinus.disabled = true;
+        elBtnPlus.disabled = true;
         updateUI();
 
         const results = [];
@@ -386,18 +442,29 @@
         });
     }
 
-    function checkWin(results) {
+    async function checkWin(results) {
         const s1 = results[0];
         const s2 = results[1];
         const s3 = results[2];
 
         if(s1.id === s2.id && s2.id === s3.id) {
             let winAmount = bet * s1.val;
-            points += winAmount;
+            
+            const newBalance = points + winAmount;
+            const { error } = await supabase
+                .from('users')
+                .update({ point: newBalance })
+                .eq('id', currentUser.id);
+            
+            if (!error) {
+                points = newBalance;
+            }
         } 
         
         isSpinning = false;
         elSpinBtn.disabled = false;
+        elBtnMinus.disabled = false;
+        elBtnPlus.disabled = false;
         updateUI();
     }
 
